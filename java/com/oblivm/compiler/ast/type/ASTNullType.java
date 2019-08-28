@@ -36,6 +36,11 @@ public class ASTNullType extends ASTType {
 	public ASTLabel getLabel() {
 		return ASTLabel.Pub;
 	}
+	//return zero accesses
+	public ASTCount getCount() {
+		return ASTCount.Zero;
+		
+	}
 
 	public boolean isNullable() {
 		return true;

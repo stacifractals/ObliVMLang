@@ -39,6 +39,7 @@ import com.oblivm.compiler.ast.stmt.ASTStatement;
 import com.oblivm.compiler.ast.stmt.ASTUsingStatement;
 import com.oblivm.compiler.ast.stmt.ASTWhileStatement;
 import com.oblivm.compiler.ast.type.ASTArrayType;
+import com.oblivm.compiler.ast.type.ASTCount;
 import com.oblivm.compiler.ast.type.ASTFloatType;
 import com.oblivm.compiler.ast.type.ASTFunctionType;
 import com.oblivm.compiler.ast.type.ASTIntType;
@@ -277,7 +278,8 @@ public class BitInferenceEngine  extends DefaultStatementExpressionVisitor<Void,
 			else if (!left.equals(right))
 				throw new RuntimeException("Bits doesn't match! "+left+"\t"+right);
 		}
-		current = ASTIntType.get(1, ASTLabel.Secure);
+		//visit 1 bit on each side. 
+		current = ASTIntType.get(1, ASTLabel.Secure, ASTCount.Two);
 		return getCurrentBits();
 	}
 
@@ -346,13 +348,15 @@ public class BitInferenceEngine  extends DefaultStatementExpressionVisitor<Void,
 				}
 			}
 		}
-		this.current = ASTIntType.get(1, ASTLabel.Secure);
+		//visiting 2 sides of predidcate
+		this.current = ASTIntType.get(1, ASTLabel.Secure, ASTCount.Two);
 		return getCurrentBits();
 	}
 
 	@Override
+	//visiting 1 side. 
 	public ASTExpression visit(ASTConstantExpression constantExpression) {
-		this.current = ASTIntType.get(constantExpression.bitSize, ASTLabel.Pub);
+		this.current = ASTIntType.get(constantExpression.bitSize, ASTLabel.Pub, ASTCount.One);
 		return constantExpression.bitSize;
 	}
 
@@ -417,7 +421,8 @@ public class BitInferenceEngine  extends DefaultStatementExpressionVisitor<Void,
 			else if (!left.equals(right))
 				throw new RuntimeException("Bits doesn't match! "+left+"\t"+right);
 		}
-		current = ASTIntType.get(1, ASTLabel.Secure);
+		//accessing both sides. 
+		current = ASTIntType.get(1, ASTLabel.Secure, ASTCount.Two);
 		return getCurrentBits();
 	}
 
@@ -512,7 +517,8 @@ public class BitInferenceEngine  extends DefaultStatementExpressionVisitor<Void,
 
 	@Override
 	public ASTExpression visit(ASTFloatConstantExpression constantExpression) {
-		this.current = ASTFloatType.get(constantExpression.bitSize, ASTLabel.Pub);
+		//visiting so 1 access
+		this.current = ASTFloatType.get(constantExpression.bitSize, ASTLabel.Pub, ASTCount.One);
 		return constantExpression.bitSize;
 	}
 
@@ -554,7 +560,8 @@ public class BitInferenceEngine  extends DefaultStatementExpressionVisitor<Void,
 
 	@Override
 	public ASTExpression visit(ASTSizeExpression exp) {
-		this.current = ASTIntType.get(32, ASTLabel.Pub);
+		//visiting one
+		this.current = ASTIntType.get(32, ASTLabel.Pub, ASTCount.One);
 		return new ASTConstantExpression(32);
 	}
 

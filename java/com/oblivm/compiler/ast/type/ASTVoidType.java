@@ -38,4 +38,7 @@ public class ASTVoidType extends ASTType {
 	public ASTLabel getLabel() {
 		return ASTLabel.Pub;
 	}
+	public ASTCount getCount() {
+		return ASTCount.Zero;
+	}
 }

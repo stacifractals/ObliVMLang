@@ -52,51 +52,59 @@ public interface CParserConstants {
   /** RegularExpression Id. */
   int PUBLIC = 29;
   /** RegularExpression Id. */
-  int STRUCT = 30;
+  int ZERO = 30;
   /** RegularExpression Id. */
-  int NATIVE = 31;
+  int ONE = 31;
   /** RegularExpression Id. */
-  int DUMMY = 32;
+  int TWO = 32;
   /** RegularExpression Id. */
-  int PHANTOM = 33;
+  int THREE = 33;
   /** RegularExpression Id. */
-  int TYPEDEF = 34;
+  int STRUCT = 34;
   /** RegularExpression Id. */
-  int FOR = 35;
+  int NATIVE = 35;
   /** RegularExpression Id. */
-  int BFOR = 36;
+  int DUMMY = 36;
   /** RegularExpression Id. */
-  int BWHILE = 37;
+  int PHANTOM = 37;
   /** RegularExpression Id. */
-  int BOT = 38;
+  int TYPEDEF = 38;
   /** RegularExpression Id. */
-  int LOG = 39;
+  int FOR = 39;
   /** RegularExpression Id. */
-  int IF = 40;
+  int BFOR = 40;
   /** RegularExpression Id. */
-  int RETURN = 41;
+  int BWHILE = 41;
   /** RegularExpression Id. */
-  int ONREAL = 42;
+  int BOT = 42;
   /** RegularExpression Id. */
-  int AFFINE = 43;
+  int LOG = 43;
   /** RegularExpression Id. */
-  int ONDUMMY = 44;
+  int IF = 44;
   /** RegularExpression Id. */
-  int NULL = 45;
+  int RETURN = 45;
   /** RegularExpression Id. */
-  int PACKAGE = 46;
+  int ONREAL = 46;
   /** RegularExpression Id. */
-  int SIZEOF = 47;
+  int AFFINE = 47;
   /** RegularExpression Id. */
-  int USING = 48;
+  int ONDUMMY = 48;
   /** RegularExpression Id. */
-  int DEBUG = 49;
+  int NULL = 49;
   /** RegularExpression Id. */
-  int IDENTIFIER = 50;
+  int PACKAGE = 50;
   /** RegularExpression Id. */
-  int LETTER = 51;
+  int SIZEOF = 51;
   /** RegularExpression Id. */
-  int DIGIT = 52;
+  int USING = 52;
+  /** RegularExpression Id. */
+  int DEBUG = 53;
+  /** RegularExpression Id. */
+  int IDENTIFIER = 54;
+  /** RegularExpression Id. */
+  int LETTER = 55;
+  /** RegularExpression Id. */
+  int DIGIT = 56;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -135,6 +143,10 @@ public interface CParserConstants {
     "\"bob\"",
     "\"secure\"",
     "\"public\"",
+    "\"zero\"",
+    "\"one\"",
+    "\"two\"",
+    "\"three\"",
     "\"struct\"",
     "\"native\"",
     "\"dummy\"",

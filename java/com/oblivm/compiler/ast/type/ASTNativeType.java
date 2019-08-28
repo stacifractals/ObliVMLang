@@ -51,4 +51,8 @@ public class ASTNativeType extends ASTType {
 	public ASTLabel getLabel() {
 		return isPhantom ? ASTLabel.Secure : ASTLabel.Pub;
 	}
+	// no clear reason to do zero accesses/
+	public ASTCount getCount() {
+		return ASTCount.Zero;
+	}
 }

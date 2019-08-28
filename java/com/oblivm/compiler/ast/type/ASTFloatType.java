@@ -10,6 +10,7 @@ public class ASTFloatType extends ASTType {
 	
 	public ASTExpression bit;
 	private ASTLabel lab;
+	private ASTCount cnt;
 	
 	public ASTExpression getBits() {
 		return bit;
@@ -19,17 +20,18 @@ public class ASTFloatType extends ASTType {
 		return lab;
 	}
 	
-	public static ASTFloatType get(ASTExpression bit, ASTLabel lab) {
-		return new ASTFloatType(bit, lab);
+	public static ASTFloatType get(ASTExpression bit, ASTLabel lab,ASTCount cnt) {
+		return new ASTFloatType(bit, lab,cnt);
 	}
 	
-	public static ASTFloatType get(int bit, ASTLabel lab) {
-		return get(new ASTConstantExpression(bit), lab);
+	public static ASTFloatType get(int bit, ASTLabel lab,ASTCount cnt) {
+		return get(new ASTConstantExpression(bit), lab, cnt);
 	}
 	
-	private ASTFloatType(ASTExpression bit, ASTLabel lab) {
+	private ASTFloatType(ASTExpression bit, ASTLabel lab, ASTCount cnt) {
 		this.bit = bit;
 		this.lab = lab;
+		this.cnt=cnt;
 	}
 	
 	public String toString(int indent) {
@@ -47,7 +49,7 @@ public class ASTFloatType extends ASTType {
 		if(!(obj instanceof ASTFloatType))
 			return false;
 		ASTFloatType other = (ASTFloatType)obj;
-		return bit.equals(other.bit) && lab == other.lab;
+		return bit.equals(other.bit) && lab == other.lab && cnt==other.cnt;
 	}
 
 	@Override
@@ -66,5 +68,10 @@ public class ASTFloatType extends ASTType {
 	@Override
 	public String shortName() {
 		return toString();
+	}
+
+	public ASTCount getCount() {
+		// TODO Auto-generated method stub
+		return cnt;
 	}
 }

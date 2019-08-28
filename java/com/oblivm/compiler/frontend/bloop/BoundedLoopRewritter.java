@@ -36,6 +36,7 @@ import com.oblivm.compiler.ast.stmt.ASTReturnStatement;
 import com.oblivm.compiler.ast.stmt.ASTStatement;
 import com.oblivm.compiler.ast.stmt.ASTUsingStatement;
 import com.oblivm.compiler.ast.stmt.ASTWhileStatement;
+import com.oblivm.compiler.ast.type.ASTCount;
 import com.oblivm.compiler.ast.type.ASTIntType;
 import com.oblivm.compiler.ast.type.ASTLabel;
 import com.oblivm.compiler.ast.type.ASTType;
@@ -83,17 +84,19 @@ public class BoundedLoopRewritter extends DefaultStatementExpressionVisitor<List
 		count = "_t_count";
 		stateVar = add(stateVar);
 		count = add(count);
-		function.localVariables.add(new Pair<ASTType, String>(ASTIntType.get(32, ASTLabel.Secure), stateVar));
-		function.localVariables.add(new Pair<ASTType, String>(ASTIntType.get(32, ASTLabel.Secure), newStateVar));
-		function.localVariables.add(new Pair<ASTType, String>(ASTIntType.get(32, ASTLabel.Pub), count));
+		//treat each as single access
+		function.localVariables.add(new Pair<ASTType, String>(ASTIntType.get(32, ASTLabel.Secure, ASTCount.One), stateVar));
+		function.localVariables.add(new Pair<ASTType, String>(ASTIntType.get(32, ASTLabel.Secure, ASTCount.One), newStateVar));
+		function.localVariables.add(new Pair<ASTType, String>(ASTIntType.get(32, ASTLabel.Pub,ASTCount.One), count));
 		List<ASTStatement> stmts = new ArrayList<ASTStatement>();
 		maxCount = 0;
 		for(int i=0; i<func.body.size(); ++i) {
 			stmts.addAll(visit(func.body.get(i)));
 		}
 		int now = 1;
+		//Set to one. would want to set to same number as total loopsize.
 		while((1 << now) < maxCount) ++ now;
-		function.localVariables.get(function.localVariables.size() - 2).left = ASTIntType.get(now, ASTLabel.Secure);
+		function.localVariables.get(function.localVariables.size() - 2).left = ASTIntType.get(now, ASTLabel.Secure, ASTCount.One);
 		func.body = stmts;
 	}
 

@@ -53,6 +53,12 @@ public class ASTTupleType extends ASTType {
 			lab = lab.meet(types.get(i).getLabel());
 		return lab;
 	}
+	public ASTCount getCount() {
+		ASTCount cnt = ASTCount.Zero;
+		for(int i=0; i<types.size(); ++i)
+			cnt = cnt.meet(types.get(i).getCount());
+		return cnt;
+	}
 
 	@Override
 	public String toString(int indent) {

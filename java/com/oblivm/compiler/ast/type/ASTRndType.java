@@ -10,7 +10,7 @@ public class ASTRndType extends ASTType {
 	
 	public ASTExpression bit;
 	private ASTLabel lab;
-	
+	private ASTCount cnt;
 	public ASTExpression getBits() {
 		return bit;
 	}
@@ -18,14 +18,16 @@ public class ASTRndType extends ASTType {
 	public ASTLabel getLabel() {
 		return lab;
 	}
+
 	
-	public static ASTRndType get(ASTExpression bit, ASTLabel lab) {
-		return new ASTRndType(bit, lab);
+	public static ASTRndType get(ASTExpression bit, ASTLabel lab, ASTCount cnt) {
+		return new ASTRndType(bit, lab, cnt);
 	}
 	
-	private ASTRndType(ASTExpression bit, ASTLabel lab) {
+	private ASTRndType(ASTExpression bit, ASTLabel lab, ASTCount cnt) {
 		this.bit = bit;
 		this.lab = ASTLabel.Secure; // Random Type must be secure
+		this.cnt=ASTCount.One; //set to one b/c each type requires 1 access
 	}
 	
 	public String toString(int indent) {
@@ -47,7 +49,7 @@ public class ASTRndType extends ASTType {
 		if(!(obj instanceof ASTRndType))
 			return false;
 		ASTRndType other = (ASTRndType)obj;
-		return bit.equals(other.bit) && lab == other.lab;
+		return bit.equals(other.bit) && lab == other.lab && cnt==other.cnt;
 	}
 
 	@Override
@@ -69,5 +71,10 @@ public class ASTRndType extends ASTType {
 	@Override
 	public String shortName() {
 		return toString();
+	}
+
+	public ASTCount getCount() {
+		// TODO Auto-generated method stub
+		return cnt;
 	}
 }

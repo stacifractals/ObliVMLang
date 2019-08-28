@@ -56,6 +56,7 @@ import com.oblivm.compiler.ast.type.ASTFloatType;
 import com.oblivm.compiler.ast.type.ASTFunctionType;
 import com.oblivm.compiler.ast.type.ASTIntType;
 import com.oblivm.compiler.ast.type.ASTLabel;
+import com.oblivm.compiler.ast.type.ASTCount;
 import com.oblivm.compiler.ast.type.ASTNativeType;
 import com.oblivm.compiler.ast.type.ASTRecType;
 import com.oblivm.compiler.ast.type.ASTRndType;
@@ -142,6 +143,10 @@ TOKEN : {
 	<BOB: "bob"> |
 	<SECURE: "secure"> |
 	<PUBLIC: "public"> |
+	<ZERO: "zero">|
+	<ONE: "one">|
+	<TWO: "two">|
+	<THREE: "three">|
 	<STRUCT: "struct"> |
 	<NATIVE: "native"> |
 	<DUMMY: "dummy"> |
@@ -193,7 +198,7 @@ ASTExpression RangeAtomicExpression() :
  				ret.setEndPosition(tok1.endLine, tok1.endColumn);
  				return ret;
  			}
- 	| tok = <SIZEOF> "(" type = Type(ASTLabel.Secure) tok1 = ")" 
+ 	| tok = <SIZEOF> "(" type = Type(ASTLabel.Secure, ASTCount.One) tok1 = ")" 
  			{
  				ret = new ASTSizeExpression(type);
  				ret.setBeginPosition(tok.beginLine, tok.beginColumn); 
@@ -222,7 +227,7 @@ ASTExpression AtomicExpression() :
 		}
 	| e = ConstantExpression() { return e; }
 	| LOOKAHEAD(2) "(" e = BIExpression() ")" { return e; }
- 	| tok = <SIZEOF> "(" type = Type(ASTLabel.Secure) tok1 = ")" 
+ 	| tok = <SIZEOF> "(" type = Type(ASTLabel.Secure, ASTCount.One) tok1 = ")" 
  			{
  				ret = new ASTSizeExpression(type);
  				ret.setBeginPosition(tok.beginLine, tok.beginColumn); 
@@ -399,8 +404,8 @@ List<ASTType> TypeVariablesInExp() :
 	List<ASTType> ret = new ArrayList<ASTType>();
 }
 {
-	"{" tyVar = Type(ASTLabel.Secure) { ret.add(tyVar); } 
-		(LOOKAHEAD(2) "," tyVar = Type(ASTLabel.Secure) { ret.add(tyVar); } )* "}" { return ret; }
+	"{" tyVar = Type(ASTLabel.Secure, ASTCount.One) { ret.add(tyVar); } 
+		(LOOKAHEAD(2) "," tyVar = Type(ASTLabel.Secure,ASTCount.One) { ret.add(tyVar); } )* "}" { return ret; }
 }
 
 List<ASTType> TypeVariables() :
@@ -409,8 +414,8 @@ List<ASTType> TypeVariables() :
 	List<ASTType> ret = new ArrayList<ASTType>();
 }
 {
-	"<" tyVar = Type(ASTLabel.Secure) { ret.add(tyVar); } 
-		(LOOKAHEAD(2) "," tyVar = Type(ASTLabel.Secure) { ret.add(tyVar); } )* ">" { return ret; }
+	"<" tyVar = Type(ASTLabel.Secure,ASTCount.One) { ret.add(tyVar); } 
+		(LOOKAHEAD(2) "," tyVar = Type(ASTLabel.Secure, ASTCount.One) { ret.add(tyVar); } )* ">" { return ret; }
 }
 
 int Constant() : 
@@ -439,7 +444,7 @@ void StructDef() :
 }
 {
 	tok = <STRUCT> v = <IDENTIFIER> { 
-		type = new ASTRecType(v.image, ASTLabel.Secure);
+		type = new ASTRecType(v.image, ASTLabel.Secure,ASTCount.One);
 		type.setBeginPosition(tok.beginLine, tok.beginColumn); 
 	}
 	( "@" v = <IDENTIFIER> {
@@ -452,7 +457,7 @@ void StructDef() :
 	[ var = TypeVariables() 
 		{ type.typeVariables = var; 
 		  program.typeVarDef.put(type.name, var); } ] 
-	"{" (tyVar = Type(ASTLabel.Secure) v = <IDENTIFIER> 
+	"{" (tyVar = Type(ASTLabel.Secure, ASTCount.One) v = <IDENTIFIER> 
 			{ 
 				type.fields.add(v.image); 
 				type.fieldsType.put(v.image, tyVar);
@@ -479,6 +484,7 @@ void TypeDef() :
 	List<ASTType> inputs = null;
 	List<ASTType> var = null;
 	ASTLabel label = ASTLabel.Secure;
+	ASTCount count = ASTCount.One;
 	ASTNativeType nt;
 	ASTExpression e;
 }
@@ -500,10 +506,10 @@ void TypeDef() :
 	    (var = TypeVariables() { type.typeVars = var; })?
 	[ { name = null; } [ v = <IDENTIFIER> { name = v.image; } { var = null; } 
 	    (var = TypeVariables() { type.typeVars = var; })? ]
-	  "(" {inputs = new ArrayList<ASTType>(); } [tmp = Type(ASTLabel.Secure) { inputs.add(tmp); } ("," tmp = Type(ASTLabel.Secure) { inputs.add(tmp); } )*] 
+	  "(" {inputs = new ArrayList<ASTType>(); } [tmp = Type(ASTLabel.Secure, ASTCount.One) { inputs.add(tmp); } ("," tmp = Type(ASTLabel.Secure, ASTCount.One) { inputs.add(tmp); } )*] 
 	  ")" 
 	] { type.setEndPosition(token.endLine, token.endColumn); }
-	"=" tmp = Type(ASTLabel.Secure) 
+	"=" tmp = Type(ASTLabel.Secure, ASTCount.One) 
 		{
 			if(tmp instanceof ASTNativeType) {
 				for (int w = 0; w < type.bitVars.size(); ++ w) {
@@ -548,17 +554,27 @@ ASTLabel Label() : {}
 	| <SECURE> { return ASTLabel.Secure; }
 	| <PUBLIC> { return ASTLabel.Pub; }
 }
+ASTCount Count() : {}
+{
+	  <ZERO> { return ASTCount.Zero; }
+	| <ONE> { return ASTCount.One; }
+	| <TWO> { return ASTCount.Two; }
+	| <THREE> { return ASTCount.Three; }
+}
 
-ASTType Type(ASTLabel defaultLabel) : 
+ASTType Type(ASTLabel defaultLabel, ASTCount defaultCount) : 
 {
 	ASTType type;
 	ASTLabel lab = defaultLabel;
+	ASTCount cnt  = defaultCount;
 	Token v, tok, tok1, tok2; 
 	int bit;
 	Token bitVar;
 	ASTExpression bitExp = null;
 	List<ASTExpression> dim = new ArrayList<ASTExpression>();
 	List<ASTLabel> labs = new ArrayList<ASTLabel>();
+	List<ASTCount> cnts = new ArrayList<ASTCount>();
+	
 	ASTExpression number;
 	List<ASTType> var;
 	boolean isDummy = false;
@@ -574,7 +590,7 @@ ASTType Type(ASTLabel defaultLabel) :
 			type.setEndPosition(v.endLine, v.endColumn);
 			return type; 
 		} 
-		| ( [ lab = Label() ] ( v = <INT_TYPE> 
+		| ( [ lab = Label() | cnt=Count() ] ( v = <INT_TYPE> 
 			[ tok2 = "@"  
 				(  bit = Constant() {
 						bitExp = new ASTConstantExpression(bit);
@@ -610,7 +626,7 @@ ASTType Type(ASTLabel defaultLabel) :
 	  			bitExp.setBeginPosition(v.beginLine, v.beginColumn + 3);
 	  			bitExp.setEndPosition(v.endLine, v.endColumn);
 	  		}
-			type = ASTIntType.get(bitExp, lab);
+			type = ASTIntType.get(bitExp, lab, cnt);
 			type.setBeginPosition(v.beginLine, v.beginColumn);
 			type.setEndPosition(token.endLine, token.endColumn); 
 	  	} 
@@ -650,7 +666,7 @@ ASTType Type(ASTLabel defaultLabel) :
 	  			bitExp.setBeginPosition(v.beginLine, v.beginColumn + 5);
 	  			bitExp.setEndPosition(v.endLine, v.endColumn);
 	  		}
-			type = ASTFloatType.get(bitExp, lab);
+			type = ASTFloatType.get(bitExp, lab, cnt);
 			type.setBeginPosition(v.beginLine, v.beginColumn);
 			type.setEndPosition(token.endLine, token.endColumn); 
 	  	} ) 
@@ -690,7 +706,7 @@ ASTType Type(ASTLabel defaultLabel) :
 	  			bitExp.setBeginPosition(v.beginLine, v.beginColumn + 3);
 	  			bitExp.setEndPosition(v.endLine, v.endColumn);
 	  		}
-			type = ASTRndType.get(bitExp, lab);
+			type = ASTRndType.get(bitExp, lab, cnt);
 			type.setBeginPosition(v.beginLine, v.beginColumn);
 			type.setEndPosition(token.endLine, token.endColumn); 
 	  	} 
@@ -731,15 +747,17 @@ ASTType Type(ASTLabel defaultLabel) :
 			type = tmp;
 		} 
 	  }
+	  //not sure code is right there
 	  [ var = TypeVariables() { vt.typeVars = var; } ]
-	  ("[" { lab = defaultLabel; } ( lab = Label() )? number = BIExpression() 
-	  		{ dim.add(number); labs.add(lab); } 
+	  ("[" { lab = defaultLabel; cnt=defaultCount; } (  lab = Label() )? number = BIExpression() 
+	  		{ dim.add(number); labs.add(lab); cnts.add(cnt); } 
 	  	"]")*
 	  {
 	  	for (int i = dim.size() - 1; i>=0; --i) {
 	  		ASTExpression num = dim.get(i);
 	  		ASTLabel l = labs.get(i);
-	  		ASTType tmp = new ASTArrayType(type, num, l);
+	  		ASTCount c = cnts.get(i);
+	  		ASTType tmp = new ASTArrayType(type, num, l, c);
 	  		tmp.setBeginPosition(type.beginPosition);
 	  		tmp.setEndPosition(token.endLine, token.endColumn);
 	  		type = tmp;
@@ -770,12 +788,13 @@ void FunctionDefinition() :
 	ASTVariableType at;
 }
 {
+//define count.
 	(<PHANTOM> { isDummy = true; })?
 	
 	( <VOID> { retType = ASTVoidType.get(); }
-	 | retType = Type(ASTLabel.Secure)
+	 | retType = Type(ASTLabel.Secure, ASTCount.One)
 	)
-		[ LOOKAHEAD(10) baseType = Type(ASTLabel.Secure) "." ]
+		[ LOOKAHEAD(10) baseType = Type(ASTLabel.Secure, ASTCount.One) "." ]
 		v = <IDENTIFIER> { name = v.image; }
 		( "@" v = <IDENTIFIER> { bitParameter.add(v.image); } )*
 		[ "<" { affine = false; } [<AFFINE> {affine = true;}] v = <IDENTIFIER> 

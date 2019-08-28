@@ -137,7 +137,7 @@ public class TypeResolver extends DefaultVisitor<ASTStatement, ASTExpression, AS
 	@Override
 	public ASTType visit(ASTArrayType type) {
 		if(copy) {
-			type = new ASTArrayType(visit(type.type), visit(type.size), type.lab);
+			type = new ASTArrayType(visit(type.type), visit(type.size), type.lab, type.cnt);
 		} else {
 			type.type = visit(type.type);
 		}
@@ -151,7 +151,7 @@ public class TypeResolver extends DefaultVisitor<ASTStatement, ASTExpression, AS
 	@Override
 	public ASTType visit(ASTIntType type) {
 		if(copy)
-			return ASTIntType.get(visit(type.getBits()), type.getLabel());
+			return ASTIntType.get(visit(type.getBits()), type.getLabel(), type.getCount());
 		else
 			return type;
 	}
@@ -159,7 +159,7 @@ public class TypeResolver extends DefaultVisitor<ASTStatement, ASTExpression, AS
 	@Override
 	public ASTType visit(ASTFloatType type) {
 		if(copy)
-			return ASTFloatType.get(visit(type.getBits()), type.getLabel());
+			return ASTFloatType.get(visit(type.getBits()), type.getLabel(),type.getCount());
 		else
 			return type;
 	}
@@ -167,7 +167,7 @@ public class TypeResolver extends DefaultVisitor<ASTStatement, ASTExpression, AS
 	@Override
 	public ASTType visit(ASTRndType type) {
 		if(copy)
-			return ASTRndType.get(visit(type.getBits()), type.getLabel());
+			return ASTRndType.get(visit(type.getBits()), type.getLabel(), type.getCount());
 		else
 			return type;
 	}
@@ -210,7 +210,7 @@ public class TypeResolver extends DefaultVisitor<ASTStatement, ASTExpression, AS
 			System.exit(1);
 		}
 
-		ASTRecType ret = new ASTRecType(type.name, type.lab);
+		ASTRecType ret = new ASTRecType(type.name, type.lab, type.cnt);
 
 		Map<String, ASTType> oldTypeVars = null;
 		if(this.isStructDef) {
@@ -285,7 +285,7 @@ public class TypeResolver extends DefaultVisitor<ASTStatement, ASTExpression, AS
 			if(ent.left.equals(type.var)) {
 				if(ent.right instanceof ASTArrayType) {
 					ASTArrayType t = (ASTArrayType)ent.right;
-					return new ASTArrayType(visit(t.type), visit(t.size), t.lab);
+					return new ASTArrayType(visit(t.type), visit(t.size), t.lab, t.cnt);
 				} else if(ent.right instanceof ASTIntType) {
 					if(type.bitVars.size() >= 2)
 						throw new RuntimeException("Too many bit variables for an int type!");
@@ -295,15 +295,15 @@ public class TypeResolver extends DefaultVisitor<ASTStatement, ASTExpression, AS
 						bits = visit(type.bitVars.get(0));
 					else
 						bits = visit(ret.getBits());
-					return ASTIntType.get(bits, ret.getLabel());
+					return ASTIntType.get(bits, ret.getLabel(), ret.getCount());
 				} else if(ent.right instanceof ASTFloatType) {
 					if(type.bitVars.size() >= 2)
 						throw new RuntimeException("Too many bit variables for a float type!");
-					return ASTFloatType.get(type.bitVars.size() == 0 ? null : visit(type.bitVars.get(0)), ((ASTFloatType)ent.right).getLabel());
+					return ASTFloatType.get(type.bitVars.size() == 0 ? null : visit(type.bitVars.get(0)), ((ASTFloatType)ent.right).getLabel(), ((ASTFloatType)ent.right).getCount());
 				} else if(ent.right instanceof ASTRndType) {
 					if(type.bitVars.size() >= 2)
 						throw new RuntimeException("Too many bit variables for a rnd type!");
-					return ASTRndType.get(type.bitVars.size() == 0 ? null : visit(type.bitVars.get(0)), ((ASTRndType)ent.right).getLabel());
+					return ASTRndType.get(type.bitVars.size() == 0 ? null : visit(type.bitVars.get(0)), ((ASTRndType)ent.right).getLabel(), ((ASTRndType)ent.right).getCount());
 				} else if(ent.right instanceof ASTNativeType) {
 					Map<String, ASTType> old_ty = new HashMap<String, ASTType>(this.typeVars);
 					Map<String, ASTExpression> old_bit = new HashMap<String, ASTExpression>(this.bitVars);
@@ -350,7 +350,7 @@ public class TypeResolver extends DefaultVisitor<ASTStatement, ASTExpression, AS
 					return ret;
 				} else if(ent.right instanceof ASTRecType) {
 					ASTRecType t = (ASTRecType)ent.right;
-					ASTRecType ret = new ASTRecType(t.name, t.lab);
+					ASTRecType ret = new ASTRecType(t.name, t.lab, t.cnt);
 
 					Map<String, ASTExpression> oldBitVars = new HashMap<String, ASTExpression>(bitVars);
 					for(ASTExpression e : type.bitVars) 
@@ -406,7 +406,7 @@ public class TypeResolver extends DefaultVisitor<ASTStatement, ASTExpression, AS
 					String suf = type.var.substring(ent.left.length());
 					try {
 						int bit = Integer.parseInt(suf);
-						return ASTIntType.get(new ASTConstantExpression(bit), it.getLabel());
+						return ASTIntType.get(new ASTConstantExpression(bit), it.getLabel(), it.getCount());
 					} catch (Exception e) {
 						continue;
 					}
@@ -419,7 +419,7 @@ public class TypeResolver extends DefaultVisitor<ASTStatement, ASTExpression, AS
 					String suf = type.var.substring(ent.left.length());
 					try {
 						int bit = Integer.parseInt(suf);
-						return ASTFloatType.get(new ASTConstantExpression(bit), it.getLabel());
+						return ASTFloatType.get(new ASTConstantExpression(bit), it.getLabel(), it.getCount());
 					} catch (Exception e) {
 						continue;
 					}
@@ -432,7 +432,7 @@ public class TypeResolver extends DefaultVisitor<ASTStatement, ASTExpression, AS
 					String suf = type.var.substring(ent.left.length());
 					try {
 						int bit = Integer.parseInt(suf);
-						return ASTRndType.get(new ASTConstantExpression(bit), it.getLabel());
+						return ASTRndType.get(new ASTConstantExpression(bit), it.getLabel(),it.getCount());
 					} catch (Exception e) {
 						continue;
 					}

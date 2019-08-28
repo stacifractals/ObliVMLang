@@ -73,4 +73,8 @@ public class ASTVariableType extends ASTType {
 	public ASTLabel getLabel() {
 		return ASTLabel.Secure;
 	}
+	public ASTCount getCount() {
+		
+		return ASTCount.One;
+	}
 }
