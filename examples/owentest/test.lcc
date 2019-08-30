@@ -1,0 +1,10 @@
+package com.oblivm.backend.generated.test;
+
+void main@n@m(int@n x) {
+    secure int32[secure 32] alc;
+   if (n > 0) {
+      alc[n]
+   } else {
+//      alc[0]
+   }
+}
