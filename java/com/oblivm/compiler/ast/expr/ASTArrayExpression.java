@@ -12,10 +12,13 @@ package com.oblivm.compiler.ast.expr;
 public class ASTArrayExpression extends ASTExpression {
 	public ASTExpression var;
 	public ASTExpression indexExpr;
+	public ASTCount cnt;
 	
 	public ASTArrayExpression(ASTExpression v, ASTExpression e) {
 		this.var = v;
 		this.indexExpr = e;
+		//set to index expression?
+		this.cnt=e.getCount();
 	}
 
 	@Override
@@ -36,5 +39,11 @@ public class ASTArrayExpression extends ASTExpression {
 	
 	public ASTArrayExpression cloneInternal() {
 		return new ASTArrayExpression(var.clone(), indexExpr.clone());
+	}
+
+	@Override
+	public ASTCount getCount() {
+		// TODO Auto-generated method stub
+		return cnt;
 	}
 }

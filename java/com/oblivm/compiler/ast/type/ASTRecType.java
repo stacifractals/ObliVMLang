@@ -14,16 +14,16 @@ public class ASTRecType extends ASTType {
 
 	public String name;
 	public ASTLabel lab;
-	public ASTCount cnt;
+	//public ASTCount cnt;
 	public List<ASTType> typeVariables;
 	public List<ASTExpression> bitVariables;
 	public List<String> fields;
 	public Map<String, ASTType> fieldsType;
 	
-	public ASTRecType(String name, ASTLabel lab, ASTCount cnt) {
+	public ASTRecType(String name, ASTLabel lab) {
 		this.name = name;
 		this.lab = lab;
-		this.cnt=cnt;
+	//	this.cnt=cnt;
 		this.typeVariables = null;
 		this.bitVariables = new ArrayList<ASTExpression>();
 		this.fieldsType = new HashMap<String, ASTType>();
@@ -112,14 +112,14 @@ public class ASTRecType extends ASTType {
 	public ASTLabel getLabel() {
 		ASTLabel ret = ASTLabel.Secure;
 		for(ASTType ty : this.fieldsType.values())
-			ret = ret.join(ty.getLabel());
+			ret = ret.meet(ty.getLabel());
 		return ret;
 	}
 	//based off label
-	public ASTCount getCount() {
+/*	public ASTCount getCount() {
 		ASTCount ret = ASTCount.One;
 		for(ASTType ty : this.fieldsType.values())
 			ret = ret.join(ty.getCount());
 		return ret;
-	}
+	}*/
 }

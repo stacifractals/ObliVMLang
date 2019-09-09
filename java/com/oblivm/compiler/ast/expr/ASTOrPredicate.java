@@ -3,7 +3,6 @@
  */
 package com.oblivm.compiler.ast.expr;
 
-
 /**
  * Defines an "or" predicate of the form "(left predicate) OR (right predicate)". 
  * Left and right predicate are both stored as member variables of type ASTPredicate.
@@ -11,10 +10,12 @@ package com.oblivm.compiler.ast.expr;
 public class ASTOrPredicate extends ASTPredicate {
 	public ASTPredicate left;
 	public ASTPredicate right;
-	
+	public ASTCount cnt;
 	public ASTOrPredicate(ASTPredicate left, ASTPredicate right) {
 		this.left = left;
 		this.right = right;
+		
+		this.cnt=right.getCount();
 	}
 	
 	public String toString() {
@@ -29,6 +30,12 @@ public class ASTOrPredicate extends ASTPredicate {
 	@Override
 	public ASTOrPredicate cloneInternal() {
 		return new ASTOrPredicate(left.clone(), right.clone());
+	}
+
+	@Override
+	public ASTCount getCount() {
+		// TODO Auto-generated method stub
+		return cnt;
 	}
 
 }

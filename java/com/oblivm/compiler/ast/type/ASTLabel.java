@@ -38,7 +38,7 @@ public class ASTLabel {
 	 * @param lab
 	 * @return
 	 */
-	public ASTLabel meet(ASTLabel lab) {
+	public ASTLabel join(ASTLabel lab) {
 		if(this == ASTLabel.Pub)
 			return lab;
 		if(lab == ASTLabel.Pub)
@@ -53,7 +53,7 @@ public class ASTLabel {
 	 * @param label
 	 * @return
 	 */
-	public ASTLabel join(ASTLabel lab) {
+	public ASTLabel meet(ASTLabel lab) {
 		if(this == ASTLabel.Secure)
 			 return lab;
 		if(lab == ASTLabel.Secure)

@@ -3,6 +3,8 @@
  */
 package com.oblivm.compiler.ast.type;
 
+import com.oblivm.compiler.ast.expr.ASTCount;
+
 public class ASTVoidType extends ASTType {
 	
 	private static ASTVoidType inst = null;
@@ -38,7 +40,7 @@ public class ASTVoidType extends ASTType {
 	public ASTLabel getLabel() {
 		return ASTLabel.Pub;
 	}
-	public ASTCount getCount() {
+/*	public ASTCount getCount() {
 		return ASTCount.Zero;
-	}
+	}*/
 }

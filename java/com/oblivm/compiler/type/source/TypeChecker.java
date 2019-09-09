@@ -22,6 +22,7 @@ import com.oblivm.compiler.ast.expr.ASTBinaryExpression.BOP;
 import com.oblivm.compiler.ast.expr.ASTBinaryPredicate;
 import com.oblivm.compiler.ast.expr.ASTBinaryPredicate.REL_OP;
 import com.oblivm.compiler.ast.expr.ASTConstantExpression;
+import com.oblivm.compiler.ast.expr.ASTCount;
 import com.oblivm.compiler.ast.expr.ASTExpression;
 import com.oblivm.compiler.ast.expr.ASTFloatConstantExpression;
 import com.oblivm.compiler.ast.expr.ASTFuncExpression;
@@ -46,7 +47,6 @@ import com.oblivm.compiler.ast.stmt.ASTStatement;
 import com.oblivm.compiler.ast.stmt.ASTUsingStatement;
 import com.oblivm.compiler.ast.stmt.ASTWhileStatement;
 import com.oblivm.compiler.ast.type.ASTArrayType;
-import com.oblivm.compiler.ast.type.ASTCount;
 import com.oblivm.compiler.ast.type.ASTDummyType;
 import com.oblivm.compiler.ast.type.ASTFloatType;
 import com.oblivm.compiler.ast.type.ASTFunctionType;
@@ -118,7 +118,7 @@ public class TypeChecker extends DefaultStatementExpressionVisitor<Boolean, List
 					ASTRecType rt = (ASTRecType)function.baseType;
 					for(ASTExpression e : rt.bitVariables) {
 						String x = ((ASTVariableExpression)e).var;
-						variableMapping.put(x, ASTIntType.get(32, ASTLabel.Pub, ASTCount.One));
+						variableMapping.put(x, ASTIntType.get(32, ASTLabel.Pub));
 						budget.addStar(x);
 					}
 					for(Map.Entry<String, ASTType> ent : rt.fieldsType.entrySet()) {
@@ -131,7 +131,7 @@ public class TypeChecker extends DefaultStatementExpressionVisitor<Boolean, List
 				}
 				ResourceBudget old_budget = budget.clone();
 				for(String e : function.bitParameter) {
-					variableMapping.put(e, ASTIntType.get(32, ASTLabel.Pub, ASTCount.One));
+					variableMapping.put(e, ASTIntType.get(32, ASTLabel.Pub));
 					budget.addStar(e);
 				}
 				for(Pair<ASTType, String> v : function.inputVariables) {
@@ -302,7 +302,7 @@ public class TypeChecker extends DefaultStatementExpressionVisitor<Boolean, List
 		ASTType ty = assertOne(visit(ifStatement.cond));
 		bcon.process(ty, ifStatement.cond);
 		//accessing once b/c conditional needs to be that
-		if(!ASTIntType.get(new ASTConstantExpression(1), ASTLabel.Pub, ASTCount.One).canFlowTo(ty)) {
+		if(!ASTIntType.get(new ASTConstantExpression(1), ASTLabel.Pub).canFlowTo(ty)) {
 //			visit(ifStatement.cond);
 			Bugs.LOG.log(ifStatement.cond.beginPosition, 
 					"if guard "+ifStatement.cond+" needs to be a boolean!");
@@ -310,7 +310,7 @@ public class TypeChecker extends DefaultStatementExpressionVisitor<Boolean, List
 		}
 		ResourceBudget oldBudget = this.budget;
 		setBudget(oldBudget.clone());
-		secureContext = secureContext.meet(ty.getLabel());
+		secureContext = secureContext.join(ty.getLabel());
 		for(ASTStatement stmt : ifStatement.trueBranch)
 			if(!visit(stmt)) {
 //				Bugs.LOG.log(stmt.beginPosition, stmt.toString()+" cannot type check!");
@@ -355,7 +355,7 @@ public class TypeChecker extends DefaultStatementExpressionVisitor<Boolean, List
 		}
 		// TODO handle case if context=Alice/Bob or label = Alice/Bob
 		//adding count to be one, needs to be the number in while. 
-		if(!ty.canFlowTo(ASTIntType.get(new ASTConstantExpression(1), ASTLabel.Pub, ASTCount.One))) {
+		if(!ty.canFlowTo(ASTIntType.get(new ASTConstantExpression(1), ASTLabel.Pub))) {
 			Bugs.LOG.log(whileStatement.cond.beginPosition, 
 					"loop guard "+whileStatement.cond+" needs to be a boolean!");
 			return false;
@@ -392,7 +392,7 @@ public class TypeChecker extends DefaultStatementExpressionVisitor<Boolean, List
 		ASTType ty = assertOne(visit(whileStatement.cond));
 		bcon.process(ty, whileStatement.cond);
 		//secure while needs same number of accesses
-		if(!ty.canFlowTo(ASTIntType.get(new ASTConstantExpression(1), ASTLabel.Secure, ASTCount.One))) {
+		if(!ty.canFlowTo(ASTIntType.get(new ASTConstantExpression(1), ASTLabel.Secure))) {
 			Bugs.LOG.log(whileStatement.cond.beginPosition,
 					"loop's guard must be a boolean value");
 			return false;
@@ -471,7 +471,7 @@ public class TypeChecker extends DefaultStatementExpressionVisitor<Boolean, List
 			}
 			ASTIntType ty2 = (ASTIntType)ty;
 			//get meet of labels. Probably how we should always do count.
-			binaryExpression.type = ASTIntType.get(ty1.getBits(), ty1.getLabel().meet(ty2.getLabel()), ty1.getCount().meet(ty2.getCount()));
+			binaryExpression.type = ASTIntType.get(ty1.getBits(), ty1.getLabel().join(ty2.getLabel()));
 			if(binaryExpression.op == ASTBinaryExpression.BOP.SHL || binaryExpression.op == ASTBinaryExpression.BOP.SHR) {
 				if(ty2.getLabel() == ASTLabel.Secure) {
 					Bugs.LOG.log(binaryExpression.right.beginPosition,
@@ -490,7 +490,7 @@ public class TypeChecker extends DefaultStatementExpressionVisitor<Boolean, List
 				return null;
 			}
 			ASTFloatType ty2 = (ASTFloatType)ty;
-			binaryExpression.type = ASTFloatType.get(ty1.getBits(), ty1.getLabel().meet(ty2.getLabel()),ty1.getCount().meet(ty2.getCount())); 
+			binaryExpression.type = ASTFloatType.get(ty1.getBits(), ty1.getLabel().join(ty2.getLabel())); 
 			return buildOne(binaryExpression.type);
 		} else {
 			if(ty != null)
@@ -503,7 +503,7 @@ public class TypeChecker extends DefaultStatementExpressionVisitor<Boolean, List
 	@Override
 	public List<ASTType> visit(ASTConstantExpression constantExpression) {
 		//constants don't need special accesses
-		constantExpression.type = ASTIntType.get(constantExpression.bitSize, ASTLabel.Pub, ASTCount.One); 
+		constantExpression.type = ASTIntType.get(constantExpression.bitSize, ASTLabel.Pub); 
 		return buildOne(constantExpression.type);
 	}
 
@@ -815,27 +815,27 @@ public class TypeChecker extends DefaultStatementExpressionVisitor<Boolean, List
 	@Override
 	public List<ASTType> visit(ASTOrPredicate orPredicate) {
 		ASTType ty = assertOne(visit(orPredicate.left));
-		if(!ty.canFlowTo(ASTIntType.get(new ASTConstantExpression(1), ASTLabel.Secure, ASTCount.One))) {
+		if(!ty.canFlowTo(ASTIntType.get(new ASTConstantExpression(1), ASTLabel.Secure))) {
 			Bugs.LOG.log(orPredicate.left.beginPosition, 
 					"a boolean value is required");
 			return null;
 		}
 		ASTIntType ty1 = (ASTIntType)ty;
 		ty = assertOne(visit(orPredicate.right));
-		if(!ty.canFlowTo(ASTIntType.get(new ASTConstantExpression(1), ASTLabel.Secure, ASTCount.One))) {
+		if(!ty.canFlowTo(ASTIntType.get(new ASTConstantExpression(1), ASTLabel.Secure))) {
 			Bugs.LOG.log(orPredicate.right.beginPosition, 
 					"a boolean value is required");
 			return null;
 		}
 		ASTIntType ty2 = (ASTIntType)ty;
-		orPredicate.type = ASTIntType.get(new ASTConstantExpression(1), ty1.getLabel().meet(ty2.getLabel()), ty1.getCount().meet(ty2.getCount())); 
+		orPredicate.type = ASTIntType.get(new ASTConstantExpression(1), ty1.getLabel().join(ty2.getLabel())); 
 		return buildOne(orPredicate.type);
 	}
 
 	@Override
 	public List<ASTType> visit(ASTAndPredicate andPredicate) {
 		ASTType ty = assertOne(visit(andPredicate.left));
-		if(!ty.canFlowTo(ASTIntType.get(new ASTConstantExpression(1), ASTLabel.Secure, ASTCount.One))) {
+		if(!ty.canFlowTo(ASTIntType.get(new ASTConstantExpression(1), ASTLabel.Secure))) {
 //			assertOne(visit(andPredicate.left));
 			Bugs.LOG.log(andPredicate.left.beginPosition, 
 					"a boolean value is required");
@@ -843,13 +843,13 @@ public class TypeChecker extends DefaultStatementExpressionVisitor<Boolean, List
 		}
 		ASTIntType ty1 = (ASTIntType)ty;
 		ty = assertOne(visit(andPredicate.right));
-		if(!ty.canFlowTo(ASTIntType.get(new ASTConstantExpression(1), ASTLabel.Secure, ASTCount.One))) {
+		if(!ty.canFlowTo(ASTIntType.get(new ASTConstantExpression(1), ASTLabel.Secure))) {
 			Bugs.LOG.log(andPredicate.right.beginPosition, 
 					"a boolean value is required");
 			return null;
 		}
 		ASTIntType ty2 = (ASTIntType)ty;
-		andPredicate.type = ASTIntType.get(new ASTConstantExpression(1), ty1.getLabel().meet(ty2.getLabel()), ty1.getCount().meet(ty2.getCount())); 
+		andPredicate.type = ASTIntType.get(new ASTConstantExpression(1), ty1.getLabel().join(ty2.getLabel())); 
 		return buildOne(andPredicate.type);
 	}
 
@@ -874,7 +874,7 @@ public class TypeChecker extends DefaultStatementExpressionVisitor<Boolean, List
 						"Type "+ty1+" doesn't match type "+ty2);
 				return null;
 			}
-			return ASTIntType.get(new ASTConstantExpression(1), ty1.getLabel().meet(ty2.getLabel()), ty1.getCount().meet(ty2.getCount()));
+			return ASTIntType.get(new ASTConstantExpression(1), ty1.getLabel().join(ty2.getLabel()));
 		} else if(lty instanceof ASTFloatType) {
 			ASTFloatType ty1 = (ASTFloatType)lty;
 			if(!(rty instanceof ASTFloatType)) {
@@ -888,7 +888,7 @@ public class TypeChecker extends DefaultStatementExpressionVisitor<Boolean, List
 						"Type "+ty1+" doesn't match type "+ty2);
 				return null;
 			}
-			return ASTIntType.get(new ASTConstantExpression(1), ty1.getLabel().meet(ty2.getLabel()), ty1.getCount().meet(ty2.getCount()));
+			return ASTIntType.get(new ASTConstantExpression(1), ty1.getLabel().join(ty2.getLabel()));
 		} else if(lty instanceof ASTDummyType) {
 			ASTType type = ((ASTDummyType)lty).type;
 			if(rty instanceof ASTNullType) {
@@ -897,7 +897,7 @@ public class TypeChecker extends DefaultStatementExpressionVisitor<Boolean, List
 							"Can only compare the equality on the null value");
 					return null;
 				}
-				return ASTIntType.get(new ASTConstantExpression(1), type.getLabel(), type.getCount());
+				return ASTIntType.get(new ASTConstantExpression(1), type.getLabel());
 			} else if(rty instanceof ASTDummyType) {
 				return cmp(lPos, type, rPos, ((ASTDummyType)rty).type, op);
 			} else {
@@ -910,7 +910,7 @@ public class TypeChecker extends DefaultStatementExpressionVisitor<Boolean, List
 				return null;
 			}
 			if(isDummyType(rty))
-				return ASTIntType.get(new ASTConstantExpression(1), rty.getLabel(), rty.getCount());
+				return ASTIntType.get(new ASTConstantExpression(1), rty.getLabel());
 			else {
 				Bugs.LOG.log(rPos, "must be a dummy type");
 				return null;
@@ -972,7 +972,7 @@ public class TypeChecker extends DefaultStatementExpressionVisitor<Boolean, List
 		if(function.baseType instanceof ASTRecType) {
 			ASTRecType rt = (ASTRecType)function.baseType;
 			for(ASTExpression e : rt.bitVariables)
-				variableMapping.put(((ASTVariableExpression)e).var, ASTIntType.get(32, ASTLabel.Pub, ASTCount.One));
+				variableMapping.put(((ASTVariableExpression)e).var, ASTIntType.get(32, ASTLabel.Pub));
 		}
 		for(Pair<ASTType, String> v : function.inputVariables) {
 			variableMapping.put(v.right, v.left);
@@ -985,7 +985,7 @@ public class TypeChecker extends DefaultStatementExpressionVisitor<Boolean, List
 
 	@Override
 	public List<ASTType> visit(ASTFloatConstantExpression constantExpression) {
-		constantExpression.type = ASTFloatType.get(constantExpression.bitSize, ASTLabel.Pub, ASTCount.One);
+		constantExpression.type = ASTFloatType.get(constantExpression.bitSize, ASTLabel.Pub);
 		return buildOne(constantExpression.type);
 	}
 
@@ -997,7 +997,7 @@ public class TypeChecker extends DefaultStatementExpressionVisitor<Boolean, List
 					"The input of log() function must be of int type");
 			return null;
 		}
-		tuple.type = ASTIntType.get(32, ASTLabel.Pub,ASTCount.One);
+		tuple.type = ASTIntType.get(32, ASTLabel.Pub);
 		return buildOne(tuple.type);
 	}
 
@@ -1029,9 +1029,7 @@ public class TypeChecker extends DefaultStatementExpressionVisitor<Boolean, List
 				tuple.ranger == null ? new ASTConstantExpression(1) :
 					new ASTBinaryExpression(
 						tuple.ranger, BOP.SUB, tuple.rangel),
-				((ASTIntType)sty).getLabel(),
-				((ASTIntType)sty).getCount()
-				);
+				((ASTIntType)sty).getLabel());
 		return buildOne(tuple.type);
 	}
 
@@ -1130,7 +1128,7 @@ public class TypeChecker extends DefaultStatementExpressionVisitor<Boolean, List
 	@Override
 	public List<ASTType> visit(ASTSizeExpression exp) {
 		//maybe not the right count?
-		return buildOne(ASTIntType.get(32, ASTLabel.Pub, ASTCount.One));
+		return buildOne(ASTIntType.get(32, ASTLabel.Pub));
 	}
 
 	@Override

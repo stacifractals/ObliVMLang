@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.oblivm.compiler.ast.expr.ASTConstantExpression;
+import com.oblivm.compiler.ast.expr.ASTCount;
 import com.oblivm.compiler.ast.expr.ASTExpression;
 import com.oblivm.compiler.ast.expr.ASTVariableExpression;
 
@@ -73,8 +74,8 @@ public class ASTVariableType extends ASTType {
 	public ASTLabel getLabel() {
 		return ASTLabel.Secure;
 	}
-	public ASTCount getCount() {
+/*	public ASTCount getCount() {
 		
 		return ASTCount.One;
-	}
+	}*/
 }

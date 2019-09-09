@@ -11,6 +11,7 @@ import com.oblivm.compiler.ast.type.ASTRecType;
 public class ASTNewObjectExpression extends ASTExpression {
 	// TODO Currently support new struct only
 	public ASTRecType type;
+	public ASTCount cnt;
 	public Map<String, ASTExpression> valueMapping;
 	
 	public ASTNewObjectExpression cloneInternal() {
@@ -24,6 +25,8 @@ public class ASTNewObjectExpression extends ASTExpression {
 	public ASTNewObjectExpression(ASTRecType type, Map<String, ASTExpression> initialValue) {
 		this.type = type;
 		this.valueMapping = initialValue;
+		//set to null? no accesses? not sure here.
+		this.cnt=ASTCount.Zero;
 	}
 
 	@Override
@@ -43,5 +46,11 @@ public class ASTNewObjectExpression extends ASTExpression {
 		}
 		sb.append(")");
 		return sb.toString();
+	}
+
+	@Override
+	public ASTCount getCount() {
+		// TODO Auto-generated method stub
+		return cnt;
 	}
 }

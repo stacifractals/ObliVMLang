@@ -15,7 +15,7 @@ package com.oblivm.compiler.ast.expr;
 public class ASTFloatConstantExpression extends ASTExpression {
 	public double value;
 	public ASTExpression bitSize;
-
+	public ASTCount cnt;
 	public ASTFloatConstantExpression cloneInternal() {
 		return new ASTFloatConstantExpression(value, bitSize);
 	}
@@ -27,6 +27,8 @@ public class ASTFloatConstantExpression extends ASTExpression {
 	public ASTFloatConstantExpression(double v, ASTExpression bitsize) {
 		this.value = v;
 		this.bitSize = bitsize;
+		//set count to zero b/c constant?
+		this.cnt=ASTCount.Zero;
 	}
 	
 	public String toString() {
@@ -45,5 +47,11 @@ public class ASTFloatConstantExpression extends ASTExpression {
 		if(!(obj instanceof ASTFloatConstantExpression))
 			return false;
 		return value == ((ASTFloatConstantExpression)obj).value; 
+	}
+
+	@Override
+	public ASTCount getCount() {
+		// TODO Auto-generated method stub
+		return cnt;
 	}
 }

@@ -6,7 +6,6 @@
  */
 package com.oblivm.compiler.ast.expr;
 
-
 /**
  * @author Chang Liu
  *
@@ -14,11 +13,13 @@ package com.oblivm.compiler.ast.expr;
 public class ASTRangeExpression extends ASTExpression {
 
 	public ASTExpression source, rangel, ranger;
-	
+	public ASTCount cnt;
 	public ASTRangeExpression(ASTExpression source, ASTExpression rangel, ASTExpression ranger) {
 		this.source = source;
 		this.rangel = rangel;
 		this.ranger = ranger;
+		//set to source count. Not sure what range does?
+		this.cnt=source.getCount();
 	}
 	
 	public String toString() {
@@ -33,6 +34,12 @@ public class ASTRangeExpression extends ASTExpression {
 	@Override
 	public ASTRangeExpression cloneInternal() {
 		return new ASTRangeExpression(source.clone(), rangel.clone(), ranger.clone());
+	}
+
+	@Override
+	public ASTCount getCount() {
+		// TODO Auto-generated method stub
+		return cnt;
 	}
 
 }

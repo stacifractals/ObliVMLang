@@ -4,9 +4,11 @@ import com.oblivm.compiler.ast.type.ASTType;
 
 public class ASTSizeExpression extends ASTExpression {
 	public ASTType type;
-	
+	public ASTCount cnt;
 	public ASTSizeExpression(ASTType type) {
 		this.type = type;
+		//size is not a count?
+		this.cnt=ASTCount.Zero;
 	}
 	
 	@Override
@@ -21,5 +23,11 @@ public class ASTSizeExpression extends ASTExpression {
 
 	public String toString() {
 		return "sizeof("+type.toString()+")";
+	}
+
+	@Override
+	public ASTCount getCount() {
+		// TODO Auto-generated method stub
+		return cnt;
 	}
 }

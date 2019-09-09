@@ -61,11 +61,14 @@ public class ASTBinaryExpression extends ASTExpression {
 	public ASTExpression left;
 	public ASTExpression right;
 	public BOP op;
+	public ASTCount cnt;
 	
 	public ASTBinaryExpression(ASTExpression left, BOP op, ASTExpression right) {
 		this.left = left;
 		this.op = op;
 		this.right = right;
+		//cnts need to be the same?
+		this.cnt=right.getCount();
 	}
 
 	@Override
@@ -105,5 +108,11 @@ public class ASTBinaryExpression extends ASTExpression {
 
 	public ASTBinaryExpression cloneInternal() {
 		return new ASTBinaryExpression(left.clone(), op, right.clone());
+	}
+
+	@Override
+	public ASTCount getCount() {
+		// TODO Auto-generated method stub
+		return cnt;
 	}
 }

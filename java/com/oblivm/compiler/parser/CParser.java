@@ -21,6 +21,7 @@ import com.oblivm.compiler.ast.expr.ASTBinaryExpression.BOP;
 import com.oblivm.compiler.ast.expr.ASTBinaryPredicate;
 import com.oblivm.compiler.ast.expr.ASTBinaryPredicate.REL_OP;
 import com.oblivm.compiler.ast.expr.ASTConstantExpression;
+import com.oblivm.compiler.ast.expr.ASTCount;
 import com.oblivm.compiler.ast.expr.ASTExpression;
 import com.oblivm.compiler.ast.expr.ASTFloatConstantExpression;
 import com.oblivm.compiler.ast.expr.ASTFuncExpression;
@@ -51,7 +52,6 @@ import com.oblivm.compiler.ast.type.ASTFloatType;
 import com.oblivm.compiler.ast.type.ASTFunctionType;
 import com.oblivm.compiler.ast.type.ASTIntType;
 import com.oblivm.compiler.ast.type.ASTLabel;
-import com.oblivm.compiler.ast.type.ASTCount;
 import com.oblivm.compiler.ast.type.ASTNativeType;
 import com.oblivm.compiler.ast.type.ASTRecType;
 import com.oblivm.compiler.ast.type.ASTRndType;
@@ -641,7 +641,7 @@ public class CParser implements CParserConstants {
         Token tok, tok1, tok2;
     tok = jj_consume_token(STRUCT);
     v = jj_consume_token(IDENTIFIER);
-                type = new ASTRecType(v.image, ASTLabel.Secure,ASTCount.One);
+                type = new ASTRecType(v.image, ASTLabel.Secure);
                 type.setBeginPosition(tok.beginLine, tok.beginColumn);
     label_9:
     while (true) {
@@ -960,14 +960,14 @@ public class CParser implements CParserConstants {
    final public ASTType Type(ASTLabel defaultLabel, ASTCount defaultCount) throws ParseException {
         ASTType type;
         ASTLabel lab = defaultLabel;
-        ASTCount cnt  = defaultCount;
+      //  ASTCount cnt  = defaultCount;
         Token v, tok, tok1, tok2;
         int bit;
         Token bitVar;
         ASTExpression bitExp = null;
         List<ASTExpression> dim = new ArrayList<ASTExpression>();
         List<ASTLabel> labs = new ArrayList<ASTLabel>();
-        List<ASTCount> cnts = new ArrayList<ASTCount>();
+       // List<ASTCount> cnts = new ArrayList<ASTCount>();
 
         ASTExpression number;
         List<ASTType> var;
@@ -999,10 +999,10 @@ public class CParser implements CParserConstants {
     case BOB:
     case SECURE:
     case PUBLIC:
-    case ZERO:
-    case ONE:
-    case TWO:
-    case THREE:
+  //  case ZERO:
+   // case ONE:
+   // case TWO:
+    //case THREE:
     case AFFINE:
     case IDENTIFIER:
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -1012,19 +1012,19 @@ public class CParser implements CParserConstants {
       case BOB:
       case SECURE:
       case PUBLIC:
-      case ZERO:
-      case ONE:
-      case TWO:
-      case THREE:
+     // case ZERO:
+      //case ONE:
+      //case TWO:
+      //case THREE:
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case ALICE:
         case BOB:
         case SECURE:
         case PUBLIC:
-        case ZERO:
-        case ONE:
-        case TWO:
-        case THREE:
+     //   case ZERO:
+  //      case ONE:
+    //    case TWO:
+      //  case THREE:
           switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
           case ALICE:
           case BOB:
@@ -1032,12 +1032,12 @@ public class CParser implements CParserConstants {
           case PUBLIC:
             lab = Label();
             break;
-          case ZERO:
-          case ONE:
-          case TWO:
-          case THREE:
-            cnt = Count();
-            break;
+          //case ZERO:
+       //   case ONE:
+         // case TWO:
+          //case THREE:
+            //cnt = Count();
+          //  break;
           default:
             jj_la1[39] = jj_gen;
             jj_consume_token(-1);
@@ -1106,7 +1106,7 @@ public class CParser implements CParserConstants {
                                 bitExp.setBeginPosition(v.beginLine, v.beginColumn + 3);
                                 bitExp.setEndPosition(v.endLine, v.endColumn);
                         }
-                        type = ASTIntType.get(bitExp, lab, cnt);
+                        type = ASTIntType.get(bitExp, lab);
                         type.setBeginPosition(v.beginLine, v.beginColumn);
                         type.setEndPosition(token.endLine, token.endColumn);
           break;
@@ -1167,7 +1167,7 @@ public class CParser implements CParserConstants {
                                 bitExp.setBeginPosition(v.beginLine, v.beginColumn + 5);
                                 bitExp.setEndPosition(v.endLine, v.endColumn);
                         }
-                        type = ASTFloatType.get(bitExp, lab, cnt);
+                        type = ASTFloatType.get(bitExp, lab);
                         type.setBeginPosition(v.beginLine, v.beginColumn);
                         type.setEndPosition(token.endLine, token.endColumn);
           break;
@@ -1234,7 +1234,7 @@ public class CParser implements CParserConstants {
                                 bitExp.setBeginPosition(v.beginLine, v.beginColumn + 3);
                                 bitExp.setEndPosition(v.endLine, v.endColumn);
                         }
-                        type = ASTRndType.get(bitExp, lab, cnt);
+                        type = ASTRndType.get(bitExp, lab);
                         type.setBeginPosition(v.beginLine, v.beginColumn);
                         type.setEndPosition(token.endLine, token.endColumn);
         break;
@@ -1340,7 +1340,7 @@ public class CParser implements CParserConstants {
         break label_16;
       }
       jj_consume_token(60);
-                 lab = defaultLabel; cnt=defaultCount;
+                 lab = defaultLabel; 
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case ALICE:
       case BOB:
@@ -1353,14 +1353,14 @@ public class CParser implements CParserConstants {
         ;
       }
       number = BIExpression();
-                          dim.add(number); labs.add(lab); cnts.add(cnt);
+                          dim.add(number); labs.add(lab); 
       jj_consume_token(61);
     }
                 for (int i = dim.size() - 1; i>=0; --i) {
                         ASTExpression num = dim.get(i);
                         ASTLabel l = labs.get(i);
-                        ASTCount c = cnts.get(i);
-                        ASTType tmp = new ASTArrayType(type, num, l, c);
+                    //    ASTCount c = cnts.get(i);
+                        ASTType tmp = new ASTArrayType(type, num, l);
                         tmp.setBeginPosition(type.beginPosition);
                         tmp.setEndPosition(token.endLine, token.endColumn);
                         type = tmp;

@@ -6,6 +6,7 @@ package com.oblivm.compiler.ast.stmt;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.oblivm.compiler.ast.expr.ASTCount;
 import com.oblivm.compiler.ast.expr.ASTPredicate;
 
 /**
@@ -17,11 +18,26 @@ public class ASTIfStatement extends ASTStatement {
 	public ASTPredicate cond;
 	public List<ASTStatement> trueBranch;
 	public List<ASTStatement> falseBranch;
-	
+	public ASTCount cnt;
+	public ASTCount tcnt;
+	public ASTCount fcnt;
 	public ASTIfStatement(ASTPredicate cond) {
 		this.cond = cond;
+		//add count to be that of the predicate.
+		this.cnt=cond.getCount();
 		trueBranch = new ArrayList<ASTStatement>();
 		falseBranch = new ArrayList<ASTStatement>();
+	
+		for(int i=0; i<trueBranch.size(); ++i) {
+			tcnt.join(trueBranch.get(i).getCount());
+		}
+		if(falseBranch.size() == 0) {
+			fcnt=ASTCount.Zero;
+		} else {
+			for(int i=0; i<falseBranch.size(); ++i)
+				fcnt.join(falseBranch.get(i).getCount());
+
+		}
 	}
 	
 	public String toString(int indent) {
@@ -45,5 +61,11 @@ public class ASTIfStatement extends ASTStatement {
 	
 	public String toString() {
 		return toString(0);
+	}
+
+	@Override
+	public ASTCount getCount() {
+		// TODO Auto-generated method stub
+		return cnt;
 	}
 }

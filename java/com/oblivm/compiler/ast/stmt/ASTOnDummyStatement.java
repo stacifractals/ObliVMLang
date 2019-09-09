@@ -6,12 +6,14 @@ package com.oblivm.compiler.ast.stmt;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.oblivm.compiler.ast.expr.ASTCount;
 import com.oblivm.compiler.ast.expr.ASTExpression;
 import com.oblivm.compiler.util.Pair;
 
 public class ASTOnDummyStatement extends ASTStatement {
 	public static class Condition {
 		private String name;
+		//public ASTCount cnt;
 		private Condition() { }
 		private Condition(String name) { this.name = name; }
 		public static Condition OnReal = new Condition("ONREAL");
@@ -25,11 +27,17 @@ public class ASTOnDummyStatement extends ASTStatement {
 	public Condition cond;
 	public List<Pair<String, ASTExpression>> condList;
 	public List<ASTStatement> body;
+	public ASTCount cnt;
 	
 	public ASTOnDummyStatement(Condition cond) {
 		this.cond = cond;
 		condList = new ArrayList<Pair<String, ASTExpression>>();
 		body = new ArrayList<ASTStatement>();
+	//	this.cnt=body.getCount();
+				for(int i=0; i<body.size(); ++i) {
+					//should be equal for all sides of tuple
+				cnt=cnt.join(body.get(i).getCount());
+				}
 	}
 	
 	public String toString(int indent) {
@@ -51,6 +59,12 @@ public class ASTOnDummyStatement extends ASTStatement {
 		sb.append(indent(indent));
 		sb.append("}\n");
 		return sb.toString();
+	}
+
+	@Override
+	public ASTCount getCount() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

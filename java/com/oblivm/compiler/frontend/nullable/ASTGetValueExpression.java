@@ -3,6 +3,7 @@
  */
 package com.oblivm.compiler.frontend.nullable;
 
+import com.oblivm.compiler.ast.expr.ASTCount;
 import com.oblivm.compiler.ast.expr.ASTExpression;
 
 /***
@@ -26,11 +27,13 @@ public class ASTGetValueExpression extends ASTExpression {
 	public HandleWay way = HandleWay.Shallow;
 	
 	public ASTExpression exp;
-	
+	public ASTCount cnt;
 	public ASTGetValueExpression(HandleWay toShaddow, ASTExpression exp) {
 		this.way = toShaddow;
 		this.exp = exp;
+		cnt=exp.getCount();
 	}
+	
 	
 	public String toString() {
 		switch (way) {
@@ -51,5 +54,11 @@ public class ASTGetValueExpression extends ASTExpression {
 
 	public ASTGetValueExpression cloneInternal() {
 		return new ASTGetValueExpression(way, exp.clone());
+	}
+
+	@Override
+	public ASTCount getCount() {
+		// TODO Auto-generated method stub
+		return cnt;
 	}
 }

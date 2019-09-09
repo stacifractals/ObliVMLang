@@ -10,7 +10,7 @@ public class ASTFloatType extends ASTType {
 	
 	public ASTExpression bit;
 	private ASTLabel lab;
-	private ASTCount cnt;
+//	private ASTCount cnt;
 	
 	public ASTExpression getBits() {
 		return bit;
@@ -20,18 +20,18 @@ public class ASTFloatType extends ASTType {
 		return lab;
 	}
 	
-	public static ASTFloatType get(ASTExpression bit, ASTLabel lab,ASTCount cnt) {
-		return new ASTFloatType(bit, lab,cnt);
+	public static ASTFloatType get(ASTExpression bit, ASTLabel lab) {
+		return new ASTFloatType(bit, lab);
 	}
 	
-	public static ASTFloatType get(int bit, ASTLabel lab,ASTCount cnt) {
-		return get(new ASTConstantExpression(bit), lab, cnt);
+	public static ASTFloatType get(int bit, ASTLabel lab) {
+		return get(new ASTConstantExpression(bit), lab);
 	}
 	
-	private ASTFloatType(ASTExpression bit, ASTLabel lab, ASTCount cnt) {
+	private ASTFloatType(ASTExpression bit, ASTLabel lab) {
 		this.bit = bit;
 		this.lab = lab;
-		this.cnt=cnt;
+	//	this.cnt=cnt;
 	}
 	
 	public String toString(int indent) {
@@ -49,7 +49,7 @@ public class ASTFloatType extends ASTType {
 		if(!(obj instanceof ASTFloatType))
 			return false;
 		ASTFloatType other = (ASTFloatType)obj;
-		return bit.equals(other.bit) && lab == other.lab && cnt==other.cnt;
+		return bit.equals(other.bit) && lab == other.lab;
 	}
 
 	@Override
@@ -70,8 +70,8 @@ public class ASTFloatType extends ASTType {
 		return toString();
 	}
 
-	public ASTCount getCount() {
+	/*public ASTCount getCount() {
 		// TODO Auto-generated method stub
 		return cnt;
-	}
+	}*/
 }

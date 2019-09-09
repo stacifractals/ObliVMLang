@@ -18,4 +18,11 @@ public class ASTNullExpression extends ASTExpression {
 	public ASTNullExpression cloneInternal() {
 		return new ASTNullExpression();
 	}
+
+	@Override
+	//zero count for null?
+	public ASTCount getCount() {
+		// TODO Auto-generated method stub
+		return ASTCount.Zero;
+	}
 }

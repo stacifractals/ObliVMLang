@@ -6,6 +6,7 @@ package com.oblivm.compiler.ast.stmt;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.oblivm.compiler.ast.expr.ASTCount;
 import com.oblivm.compiler.ast.expr.ASTPredicate;
 
 /**
@@ -21,11 +22,18 @@ public class ASTWhileStatement extends ASTStatement {
 	public ASTStatement init;
 	public ASTPredicate cond;
 	public List<ASTStatement> body;
+	public ASTCount cnt;
 	
 	public ASTWhileStatement(ASTPredicate cond) {
 		this.cond = cond;
 		this.body = new ArrayList<ASTStatement>();
-	}
+		for(int i=0; i<body.size(); ++i) {
+			//should be equal for all sides of tuple
+		cnt=cnt.join(body.get(i).getCount());
+		}
+}
+
+	
 	
 	public String toString(int indent) {
 		StringBuffer sb = new StringBuffer();
@@ -44,5 +52,11 @@ public class ASTWhileStatement extends ASTStatement {
 	
 	public String toString() {
 		return toString(0);
+	}
+
+	@Override
+	public ASTCount getCount() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

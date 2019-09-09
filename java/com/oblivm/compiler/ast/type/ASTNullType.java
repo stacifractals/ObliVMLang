@@ -3,6 +3,8 @@
  */
 package com.oblivm.compiler.ast.type;
 
+import com.oblivm.compiler.ast.expr.ASTCount;
+
 public class ASTNullType extends ASTType {
 	private static ASTNullType inst = null;
 	
@@ -37,11 +39,11 @@ public class ASTNullType extends ASTType {
 		return ASTLabel.Pub;
 	}
 	//return zero accesses
-	public ASTCount getCount() {
+/*	public ASTCount getCount() {
 		return ASTCount.Zero;
 		
 	}
-
+*/
 	public boolean isNullable() {
 		return true;
 	}

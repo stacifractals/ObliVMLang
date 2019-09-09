@@ -34,11 +34,13 @@ public class ASTBinaryPredicate extends ASTPredicate {
 	public ASTExpression left;
 	public ASTExpression right;
 	public REL_OP op;
-	
+	public ASTCount cnt;
 	public ASTBinaryPredicate(ASTExpression left, REL_OP op, ASTExpression right) {
 		this.left = left;
 		this.op = op;
 		this.right = right;
+		//count needs to be equal on both sides?
+		this.cnt=right.getCount();
 	}
 
 	public String toString() {
@@ -52,5 +54,11 @@ public class ASTBinaryPredicate extends ASTPredicate {
 
 	public ASTBinaryPredicate cloneInternal() {
 		return new ASTBinaryPredicate(left.clone(), op, right.clone());
+	}
+
+	@Override
+	public ASTCount getCount() {
+		// TODO Auto-generated method stub
+		return cnt;
 	}
 }

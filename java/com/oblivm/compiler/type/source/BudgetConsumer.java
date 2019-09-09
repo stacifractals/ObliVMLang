@@ -119,10 +119,10 @@ public class BudgetConsumer extends ASTDefaultTypeVisitor<Boolean> implements Ex
 		ASTType target = this.targetType;
 		this.cancelMode = true;
 		ASTArrayType at = (ASTArrayType)arrayExpression.var.type;
-		process(ASTIntType.get(at.size.targetBits, at.lab, at.cnt), 
+		process(ASTIntType.get(at.size.targetBits, at.lab), 
 				arrayExpression.indexExpr);
 		this.cancelMode = old;
-		this.targetType = new ASTArrayType(target, at.size, at.lab, at.cnt);
+		this.targetType = new ASTArrayType(target, at.size, at.lab);
 		visit(arrayExpression.var);
 		return null;
 	}

@@ -50,15 +50,15 @@ public class ASTTupleType extends ASTType {
 	public ASTLabel getLabel() {
 		ASTLabel lab = ASTLabel.Pub;
 		for(int i=0; i<types.size(); ++i)
-			lab = lab.meet(types.get(i).getLabel());
+			lab = lab.join(types.get(i).getLabel());
 		return lab;
 	}
-	public ASTCount getCount() {
-		ASTCount cnt = ASTCount.Zero;
+//	public ASTCount getCount() {
+	/*	ASTCount cnt = ASTCount.Zero;
 		for(int i=0; i<types.size(); ++i)
-			cnt = cnt.meet(types.get(i).getCount());
+			cnt = cnt.join(types.get(i).getCount());
 		return cnt;
-	}
+	}*/
 
 	@Override
 	public String toString(int indent) {

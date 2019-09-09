@@ -3,6 +3,7 @@
  */
 package com.oblivm.compiler.frontend.bloop;
 
+import com.oblivm.compiler.ast.expr.ASTCount;
 import com.oblivm.compiler.ast.expr.ASTExpression;
 import com.oblivm.compiler.ast.stmt.ASTStatement;
 
@@ -30,6 +31,13 @@ public class ASTBranchStatement extends ASTStatement {
 			return indent(indent)+"jmp -> "+goTrue+";\n";
 		else
 			return indent(indent)+"br "+pred+" | T -> "+goTrue+" | F -> "+goFalse+";\n";
+	}
+
+	@Override
+	//let the branch be null? not sure?
+	public ASTCount getCount() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

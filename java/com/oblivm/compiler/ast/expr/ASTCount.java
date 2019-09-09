@@ -1,7 +1,7 @@
 /***
  Created by Ana McTaggart 2019.
  */
-package com.oblivm.compiler.ast.type;
+package com.oblivm.compiler.ast.expr;
 
 public class ASTCount {
 	public static final ASTCount Zero = new ASTCount("zero", 0);
@@ -23,11 +23,7 @@ public class ASTCount {
 		return name;
 	}
 	
-	public boolean less(ASTCount cnt) {
-		if(this == Zero || cnt == Zero || this == cnt)
-			return true;
-		return false;
-	}
+	
 	public boolean equal(ASTCount cnt) {
 		if(this==cnt) {
 		return true;
@@ -50,14 +46,28 @@ public class ASTCount {
 	 * @param cnt
 	 * @return
 	 */
-	public ASTCount meet(ASTCount cnt) {
-		if(this == ASTCount.Zero)
+	public ASTCount join(ASTCount cnt) {
+		if(this == ASTCount.Zero && cnt==ASTCount.Zero)
 			return cnt;
-		if(cnt == ASTCount.Zero)
+		if(cnt == ASTCount.One && this == ASTCount.Zero)
+			return cnt;
+		if(cnt==ASTCount.Zero && this == ASTCount.One)
 			return this;
-		if(this == cnt)
+		if(cnt == ASTCount.One && this == ASTCount.One)
+			return ASTCount.Two;
+		if(cnt==ASTCount.Two && this == ASTCount.Zero)
+			return cnt;
+		if(cnt == ASTCount.Zero && this == ASTCount.Two)
 			return this;
-		return ASTCount.Three;
+		if(cnt==ASTCount.One && this == ASTCount.Two)
+			return ASTCount.Three;
+		if(cnt == ASTCount.Two && this == ASTCount.One)
+			return ASTCount.Three;
+		if(cnt==ASTCount.Three && this == ASTCount.Zero)
+			return cnt;
+		if(cnt == ASTCount.Zero && this == ASTCount.Three)
+			return this;
+		return null;
 	}
 
 	/***
@@ -65,7 +75,7 @@ public class ASTCount {
 	 * @param cntel
 	 * @return
 	 */
-	public ASTCount join(ASTCount cnt) {
+	/*public ASTCount meet(ASTCount cnt) {
 		if(this == ASTCount.Three)
 			 return cnt;
 		if(cnt == ASTCount.Three)
@@ -73,5 +83,5 @@ public class ASTCount {
 		if(cnt == this)
 			return this;
 		return Zero;
-	}
+	}*/
 }

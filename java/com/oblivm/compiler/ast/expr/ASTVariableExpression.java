@@ -14,9 +14,11 @@ import com.oblivm.compiler.parser.Token;
  */
 public class ASTVariableExpression extends ASTExpression {
 	public String var;
-	
+	public ASTCount cnt;
 	public ASTVariableExpression(String var) {
 		this.var = var;
+		//set cnt to zero? unclear what value should be. should be count of internal variables?
+		this.cnt=ASTCount.Zero;
 	}
 	
 	public ASTVariableExpression(String var, int beginLine, int endLine, int beginColumn, int endColumn) {
@@ -47,5 +49,11 @@ public class ASTVariableExpression extends ASTExpression {
 	@Override
 	public ASTVariableExpression cloneInternal() {
 		return new ASTVariableExpression(var);
+	}
+
+	@Override
+	public ASTCount getCount() {
+		// TODO Auto-generated method stub
+		return cnt;
 	}
 }

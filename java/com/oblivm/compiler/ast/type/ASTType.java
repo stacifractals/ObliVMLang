@@ -35,5 +35,5 @@ public abstract class ASTType extends AST {
 	}
 	
 	public abstract ASTLabel getLabel();
-	public abstract ASTCount getCount();
+	//public abstract ASTCount getCount();
 }

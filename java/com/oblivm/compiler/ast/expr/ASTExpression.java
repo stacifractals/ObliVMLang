@@ -26,7 +26,7 @@ public abstract class ASTExpression extends AST {
 
 	
 	public ASTExpression targetBits = null;
-	
+	public ASTCount cnt=null;
 	public ASTType type = null;
 	
 	public String toString(int indent) {
@@ -43,4 +43,6 @@ public abstract class ASTExpression extends AST {
 		exp.setEndPosition(this.endPosition);
 		return exp;
 	}
+
+	public abstract ASTCount getCount();
 }

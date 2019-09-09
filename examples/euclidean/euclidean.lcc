@@ -6,8 +6,8 @@ int@n sqrt(int@n m) = native intLib.sqrt;
 // bb is the N-dim cordinates (integers) of Bob
 
  int32 main@n@m(int@n x, int@m y) {
-	one int32[public (n/32)] alc;
-	one int32[public (n/32)] bb;
+	secure int32[secure (n/32)] alc;
+	secure int32[secure (n/32)] bb;
 	public int32 N = n / 32;
 	
 	for(public int32 i=0; i<N; i = i + 1) {
@@ -15,7 +15,7 @@ int@n sqrt(int@n m) = native intLib.sqrt;
 		bb[i] = y$32*i~32*i+32$;
 	}
 
-	one int32 flt = 0;
+	secure int32 flt = 0;
 	for(public int32 i=0; i<N; i = i + 1) {
 		flt = flt + (alc[i]-bb[i]) * (alc[i]-bb[i]);
 	}

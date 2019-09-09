@@ -66,20 +66,20 @@ public class NoClass<t__T> implements IWritable<NoClass<t__T>, t__T>, ISecureRun
 	}
 
 	public t__T[] main(int n, int m, t__T[] x, t__T[] y) throws Exception {
-		t__T[][] alc = env.newTArray((n)/(32), 0);
+		SecureArray<t__T> alc = new SecureArray<t__T>(env, (n)/(32), 32);
 		for(int _j_2 = 0; _j_2 < (n)/(32); ++_j_2) {
-			alc[_j_2] = env.inputOfAlice(Utils.fromInt(0, 32));
+			alc.write(intLib.toSignals(_j_2), env.inputOfAlice(Utils.fromInt(0, 32)));
 		}
-		t__T[][] bb = env.newTArray((n)/(32), 0);
+		SecureArray<t__T> bb = new SecureArray<t__T>(env, (n)/(32), 32);
 		for(int _j_2 = 0; _j_2 < (n)/(32); ++_j_2) {
-			bb[_j_2] = env.inputOfAlice(Utils.fromInt(0, 32));
+			bb.write(intLib.toSignals(_j_2), env.inputOfAlice(Utils.fromInt(0, 32)));
 		}
 		int N = 0;
 		int i = 0;
 		t__T[] flt = env.inputOfAlice(Utils.fromInt(0, 32));
 		t__T[] _t_state = env.inputOfAlice(Utils.fromInt(0, 32));
 		t__T _t_state_new = env.inputOfAlice(false);
-		int _t_count = 0;
+		t__T[] _t_count = env.inputOfAlice(Utils.fromInt(0, 32));
 		int __tmp0 = 32;
 		int f_tmp_1 = n / __tmp0;
 		int __tmp1 = f_tmp_1;
@@ -91,47 +91,53 @@ public class NoClass<t__T> implements IWritable<NoClass<t__T>, t__T>, ISecureRun
 		while(__tmp3) {
 			t__T[] __tmp4 = Arrays.copyOfRange(x, (32)*(i), ((32)*(i))+(32));
 			t__T[] __tmp5 = intLib.enforceBits(__tmp4, 32);
-			alc[i]=__tmp5;
+			t__T[] f_tmp_4 = env.inputOfAlice(Utils.fromInt(i, 32));
+			alc.write(f_tmp_4,__tmp5);
 			t__T[] __tmp6 = Arrays.copyOfRange(y, (32)*(i), ((32)*(i))+(32));
 			t__T[] __tmp7 = intLib.enforceBits(__tmp6, 32);
-			bb[i]=__tmp7;
+			t__T[] f_tmp_5 = env.inputOfAlice(Utils.fromInt(i, 32));
+			bb.write(f_tmp_5,__tmp7);
 			int __tmp8 = 1;
-			int f_tmp_5 = i + __tmp8;
-			int __tmp9 = f_tmp_5;
+			int f_tmp_7 = i + __tmp8;
+			int __tmp9 = f_tmp_7;
 			i = __tmp9;
-			boolean f_tmp_6 = i < N;
-			__tmp3 = f_tmp_6;
+			boolean f_tmp_8 = i < N;
+			__tmp3 = f_tmp_8;
 		}
 		int __tmp10 = 0;
 		flt = env.inputOfAlice(Utils.fromInt(__tmp10, 32));
 		int __tmp11 = 0;
 		i = __tmp11;
-		boolean f_tmp_9 = i < N;
-		boolean __tmp12 = f_tmp_9;
+		boolean f_tmp_11 = i < N;
+		boolean __tmp12 = f_tmp_11;
 		while(__tmp12) {
-			t__T[] f_tmp_10 = alc[i];
-			t__T[] __tmp13 = f_tmp_10;
-			t__T[] f_tmp_11 = bb[i];
-			t__T[] __tmp14 = f_tmp_11;
-			t__T[] f_tmp_12 = intLib.sub(__tmp13,__tmp14);
-			t__T[] __tmp15 = f_tmp_12;
-			t__T[] f_tmp_13 = alc[i];
-			t__T[] __tmp16 = f_tmp_13;
-			t__T[] f_tmp_14 = bb[i];
-			t__T[] __tmp17 = f_tmp_14;
-			t__T[] f_tmp_15 = intLib.sub(__tmp16,__tmp17);
-			t__T[] __tmp18 = f_tmp_15;
-			t__T[] f_tmp_16 = intLib.multiply(__tmp15,__tmp18);
-			t__T[] __tmp19 = f_tmp_16;
-			t__T[] f_tmp_17 = intLib.add(flt,__tmp19);
-			t__T[] __tmp20 = f_tmp_17;
+			t__T[] f_tmp_13 = env.inputOfAlice(Utils.fromInt(i, 32));
+			t__T[] f_tmp_12 = alc.read(f_tmp_13);
+			t__T[] __tmp13 = f_tmp_12;
+			t__T[] f_tmp_15 = env.inputOfAlice(Utils.fromInt(i, 32));
+			t__T[] f_tmp_14 = bb.read(f_tmp_15);
+			t__T[] __tmp14 = f_tmp_14;
+			t__T[] f_tmp_16 = intLib.sub(__tmp13,__tmp14);
+			t__T[] __tmp15 = f_tmp_16;
+			t__T[] f_tmp_18 = env.inputOfAlice(Utils.fromInt(i, 32));
+			t__T[] f_tmp_17 = alc.read(f_tmp_18);
+			t__T[] __tmp16 = f_tmp_17;
+			t__T[] f_tmp_20 = env.inputOfAlice(Utils.fromInt(i, 32));
+			t__T[] f_tmp_19 = bb.read(f_tmp_20);
+			t__T[] __tmp17 = f_tmp_19;
+			t__T[] f_tmp_21 = intLib.sub(__tmp16,__tmp17);
+			t__T[] __tmp18 = f_tmp_21;
+			t__T[] f_tmp_22 = intLib.multiply(__tmp15,__tmp18);
+			t__T[] __tmp19 = f_tmp_22;
+			t__T[] f_tmp_23 = intLib.add(flt,__tmp19);
+			t__T[] __tmp20 = f_tmp_23;
 			flt = __tmp20;
 			int __tmp21 = 1;
-			int f_tmp_19 = i + __tmp21;
-			int __tmp22 = f_tmp_19;
+			int f_tmp_25 = i + __tmp21;
+			int __tmp22 = f_tmp_25;
 			i = __tmp22;
-			boolean f_tmp_20 = i < N;
-			__tmp12 = f_tmp_20;
+			boolean f_tmp_26 = i < N;
+			__tmp12 = f_tmp_26;
 		}
 		t__T[] __tmp23 = intLib.enforceBits(flt, n);
 		t__T[] __tmp24 = noclass.intLib.sqrt(__tmp23);

@@ -15,7 +15,7 @@ package com.oblivm.compiler.ast.expr;
 public class ASTConstantExpression extends ASTExpression {
 	public int value;
 	public ASTExpression bitSize;
-	
+	public ASTCount cnt;
 	public ASTConstantExpression(int v) {
 		this(v, null);
 	}
@@ -23,6 +23,8 @@ public class ASTConstantExpression extends ASTExpression {
 	public ASTConstantExpression(int v, ASTExpression bitsize) {
 		this.value = v;
 		this.bitSize = bitsize;
+		//no accesses for constant expressions?
+		this.cnt=ASTCount.Zero;
 	}
 
 	public ASTConstantExpression(int v, int constant) {
@@ -49,5 +51,11 @@ public class ASTConstantExpression extends ASTExpression {
 
 	public ASTConstantExpression cloneInternal() {
 		return new ASTConstantExpression(value, bitSize);
+	}
+
+	@Override
+	public ASTCount getCount() {
+		// TODO Auto-generated method stub
+		return cnt;
 	}
 }

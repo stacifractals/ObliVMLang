@@ -15,7 +15,7 @@ public class ASTFuncExpression extends ASTExpression {
 	public List<ASTType> typeVars = null; 
 	public List<Pair<String, ASTExpression>> inputs;
 	public List<ASTExpression> bitParameters;
-	
+	public ASTCount cnt;
 	public ASTFuncExpression cloneInternal() {
 		List<ASTExpression> bits = new ArrayList<ASTExpression>();
 		for(ASTExpression e : bitParameters)
@@ -35,6 +35,8 @@ public class ASTFuncExpression extends ASTExpression {
 	
 	public ASTFuncExpression(ASTExpression obj, List<ASTExpression> bitParameters, List<ASTType> typeVars) {
 		this.obj = obj;
+		//cnt is that of the object that calls the function? should it be bitparams instead?
+		this.cnt=obj.getCount();
 		if(bitParameters == null)
 			this.bitParameters = new ArrayList<ASTExpression>();
 		else
@@ -91,5 +93,11 @@ public class ASTFuncExpression extends ASTExpression {
 		}
 		sb.append(")");
 		return sb.toString();
+	}
+
+	@Override
+	public ASTCount getCount() {
+		// TODO Auto-generated method stub
+		return cnt;
 	}
 }

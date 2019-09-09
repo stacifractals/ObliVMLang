@@ -40,9 +40,9 @@ public class ASTDummyType extends ASTType {
 	public ASTLabel getLabel() {
 		return type.getLabel();
 	}
-	public ASTCount getCount() {
+/*	public ASTCount getCount() {
 		return type.getCount();
-	}
+	}*/
 
 	public boolean isNullable() {
 		return true;

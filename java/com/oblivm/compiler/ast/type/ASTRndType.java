@@ -4,13 +4,14 @@
 package com.oblivm.compiler.ast.type;
 
 import com.oblivm.compiler.ast.expr.ASTConstantExpression;
+import com.oblivm.compiler.ast.expr.ASTCount;
 import com.oblivm.compiler.ast.expr.ASTExpression;
 
 public class ASTRndType extends ASTType {
 	
 	public ASTExpression bit;
 	private ASTLabel lab;
-	private ASTCount cnt;
+	//private ASTCount cnt;
 	public ASTExpression getBits() {
 		return bit;
 	}
@@ -20,14 +21,14 @@ public class ASTRndType extends ASTType {
 	}
 
 	
-	public static ASTRndType get(ASTExpression bit, ASTLabel lab, ASTCount cnt) {
-		return new ASTRndType(bit, lab, cnt);
+	public static ASTRndType get(ASTExpression bit, ASTLabel lab) {
+		return new ASTRndType(bit, lab);
 	}
 	
-	private ASTRndType(ASTExpression bit, ASTLabel lab, ASTCount cnt) {
+	private ASTRndType(ASTExpression bit, ASTLabel lab) {
 		this.bit = bit;
 		this.lab = ASTLabel.Secure; // Random Type must be secure
-		this.cnt=ASTCount.One; //set to one b/c each type requires 1 access
+		//this.cnt=ASTCount.One; //set to one b/c each type requires 1 access
 	}
 	
 	public String toString(int indent) {
@@ -49,7 +50,7 @@ public class ASTRndType extends ASTType {
 		if(!(obj instanceof ASTRndType))
 			return false;
 		ASTRndType other = (ASTRndType)obj;
-		return bit.equals(other.bit) && lab == other.lab && cnt==other.cnt;
+		return bit.equals(other.bit) && lab == other.lab;
 	}
 
 	@Override
@@ -73,8 +74,8 @@ public class ASTRndType extends ASTType {
 		return toString();
 	}
 
-	public ASTCount getCount() {
+	/*public ASTCount getCount() {
 		// TODO Auto-generated method stub
 		return cnt;
-	}
+	}*/
 }

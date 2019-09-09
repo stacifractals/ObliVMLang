@@ -3,6 +3,7 @@ package com.oblivm.compiler.ast.stmt;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.oblivm.compiler.ast.expr.ASTCount;
 import com.oblivm.compiler.ast.expr.ASTExpression;
 import com.oblivm.compiler.util.Pair;
 
@@ -10,6 +11,8 @@ public class ASTUsingStatement extends ASTStatement {
 
 	public List<Pair<String, ASTExpression>> use = new ArrayList<Pair<String, ASTExpression>>();
 	public List<ASTStatement> body = new ArrayList<ASTStatement>();
+	//set to one to use expression?
+	public ASTCount cnt = ASTCount.One;
 	
 	public String toString(int indent) {
 		StringBuffer sb = new StringBuffer();
@@ -32,6 +35,12 @@ public class ASTUsingStatement extends ASTStatement {
 	
 	public String toString() {
 		return toString(0);
+	}
+
+	@Override
+	public ASTCount getCount() {
+		// TODO Auto-generated method stub
+		return cnt;
 	}
 
 

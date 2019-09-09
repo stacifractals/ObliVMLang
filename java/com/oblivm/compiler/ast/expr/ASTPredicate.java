@@ -4,6 +4,7 @@
 package com.oblivm.compiler.ast.expr;
 
 public abstract class ASTPredicate extends ASTExpression {
+	public ASTCount cnt;
 	public String toString(int indent) {
 		return toString();
 	}

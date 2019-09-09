@@ -74,7 +74,7 @@ public class NoClass<t__T> implements IWritable<NoClass<t__T>, t__T>, ISecureRun
 		int i = 0;
 		t__T[] _t_state = env.inputOfAlice(Utils.fromInt(0, 32));
 		t__T _t_state_new = env.inputOfAlice(false);
-		int _t_count = 0;
+		t__T[] _t_count = env.inputOfAlice(Utils.fromInt(0, 32));
 		int __tmp0 = 0;
 		i = __tmp0;
 		boolean f_tmp_1 = i < n;
@@ -136,7 +136,7 @@ public class NoClass<t__T> implements IWritable<NoClass<t__T>, t__T>, ISecureRun
 		Pair<t__T, bit<t__T>, Int<t__T>> ret = new Pair<t__T, bit<t__T>, Int<t__T>>(env, new bit<t__T>(env), new Int<t__T>(env, Utils.logFloor(((n)/(2))+(1))));
 		t__T[] _t_state = env.inputOfAlice(Utils.fromInt(0, 32));
 		t__T _t_state_new = env.inputOfAlice(false);
-		int _t_count = 0;
+		t__T[] _t_count = env.inputOfAlice(Utils.fromInt(0, 32));
 		int __tmp21 = 1;
 		boolean f_tmp_20 = n == __tmp21;
 		boolean __tmp22 = f_tmp_20;
@@ -210,7 +210,7 @@ public class NoClass<t__T> implements IWritable<NoClass<t__T>, t__T>, ISecureRun
 		t__T[] z = env.inputOfAlice(Utils.fromInt(0, n));
 		t__T[] _t_state = env.inputOfAlice(Utils.fromInt(0, 32));
 		t__T _t_state_new = env.inputOfAlice(false);
-		int _t_count = 0;
+		t__T[] _t_count = env.inputOfAlice(Utils.fromInt(0, 32));
 		t__T[] f_tmp_37 = intLib.xor(x,y);
 		t__T[] __tmp60 = f_tmp_37;
 		z = __tmp60;
@@ -221,7 +221,7 @@ public class NoClass<t__T> implements IWritable<NoClass<t__T>, t__T>, ISecureRun
 	public t__T[] main(int n, int m, t__T[] x, t__T[] y) throws Exception {
 		t__T[] _t_state = env.inputOfAlice(Utils.fromInt(0, 32));
 		t__T _t_state_new = env.inputOfAlice(false);
-		int _t_count = 0;
+		t__T[] _t_count = env.inputOfAlice(Utils.fromInt(0, 32));
 		t__T[] __tmp62 = intLib.enforceBits(y, n);
 		t__T[] __tmp63 = noclass.hamming(n, x, __tmp62);
 		return __tmp63;

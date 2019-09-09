@@ -19,6 +19,7 @@ import com.oblivm.compiler.ast.expr.ASTBinaryExpression.BOP;
 import com.oblivm.compiler.ast.expr.ASTBinaryPredicate;
 import com.oblivm.compiler.ast.expr.ASTBinaryPredicate.REL_OP;
 import com.oblivm.compiler.ast.expr.ASTConstantExpression;
+import com.oblivm.compiler.ast.expr.ASTCount;
 import com.oblivm.compiler.ast.expr.ASTExpression;
 import com.oblivm.compiler.ast.expr.ASTFloatConstantExpression;
 import com.oblivm.compiler.ast.expr.ASTFuncExpression;
@@ -44,7 +45,6 @@ import com.oblivm.compiler.ast.stmt.ASTStatement;
 import com.oblivm.compiler.ast.stmt.ASTUsingStatement;
 import com.oblivm.compiler.ast.stmt.ASTWhileStatement;
 import com.oblivm.compiler.ast.type.ASTArrayType;
-import com.oblivm.compiler.ast.type.ASTCount;
 import com.oblivm.compiler.ast.type.ASTDummyType;
 import com.oblivm.compiler.ast.type.ASTFloatType;
 import com.oblivm.compiler.ast.type.ASTIntType;
@@ -74,14 +74,14 @@ public class NullableRewriter extends DefaultStatementExpressionVisitor<ASTState
 					for(ASTExpression e : rt.bitVariables) {
 						String var = ((ASTVariableExpression)e).var;
 						//set to one b/c single var
-						variableMapping.put(var, ASTIntType.get(32, ASTLabel.Pub, ASTCount.One));
+						variableMapping.put(var, ASTIntType.get(32, ASTLabel.Pub));
 					}
 					for(Map.Entry<String, ASTType> ent : rt.fieldsType.entrySet()) {
 						variableMapping.put(ent.getKey(), ent.getValue());
 					}
 				}
 				for(String x : this.function.bitParameter) {
-					variableMapping.put(x, ASTIntType.get(32, ASTLabel.Pub,ASTCount.One));
+					variableMapping.put(x, ASTIntType.get(32, ASTLabel.Pub));
 				}
 				for(Pair<ASTType, String> ent : this.function.inputVariables) {
 					variableMapping.put(ent.right, ent.left);
@@ -253,7 +253,7 @@ public class NullableRewriter extends DefaultStatementExpressionVisitor<ASTState
 				// Ensure the condition to be ? == null.
 				binaryPredicate.left = right.left;
 				binaryPredicate.right = left.left;
-				return new Pair<ASTExpression, List<ASTType>>(binaryPredicate, one(ASTIntType.get(1, ltype.getLabel().meet(rtype.getLabel()), ltype.getCount().meet(rtype.getCount()))));
+				return new Pair<ASTExpression, List<ASTType>>(binaryPredicate, one(ASTIntType.get(1, ltype.getLabel().join(rtype.getLabel()))));
 			} else if(rtype == ASTNullType.get()) {
 				if(rememberPredicate) {
 					if(binaryPredicate.op == REL_OP.EQ) {
@@ -265,7 +265,7 @@ public class NullableRewriter extends DefaultStatementExpressionVisitor<ASTState
 				}
 				binaryPredicate.right = right.left;
 				binaryPredicate.left = left.left;
-				return new Pair<ASTExpression, List<ASTType>>(binaryPredicate, one(ASTIntType.get(1, ltype.getLabel().meet(rtype.getLabel()), ltype.getCount().meet(rtype.getCount()))));
+				return new Pair<ASTExpression, List<ASTType>>(binaryPredicate, one(ASTIntType.get(1, ltype.getLabel().join(rtype.getLabel()))));
 			} else {
 				ASTPredicate cond;
 				if(binaryPredicate.op == REL_OP.EQ || binaryPredicate.op == REL_OP.NEQ) {
@@ -293,7 +293,7 @@ public class NullableRewriter extends DefaultStatementExpressionVisitor<ASTState
 						this.currentUnNullExp.add(right.left.toString());
 					}
 				}
-				return new Pair<ASTExpression, List<ASTType>>(cond, one(ASTIntType.get(1, ltype.getLabel().meet(rtype.getLabel()),ltype.getCount().meet(rtype.getCount()))));
+				return new Pair<ASTExpression, List<ASTType>>(cond, one(ASTIntType.get(1, ltype.getLabel().join(rtype.getLabel()))));
 			}
 		} else if(ltype.isNullable() && !rtype.isNullable()) {
 			if(rememberPredicate) {
@@ -303,7 +303,7 @@ public class NullableRewriter extends DefaultStatementExpressionVisitor<ASTState
 			binaryPredicate.left = new ASTGetValueExpression(HandleWay.GetValue, left.left);
 			ASTBinaryPredicate cond = new ASTBinaryPredicate(left.left, REL_OP.NEQ, new ASTNullExpression());
 			ASTPredicate pred = new ASTAndPredicate(cond, binaryPredicate);
-			return new Pair<ASTExpression, List<ASTType>>(pred, one(ASTIntType.get(1, ltype.getLabel().meet(rtype.getLabel()),ltype.getCount().meet(rtype.getCount()))));
+			return new Pair<ASTExpression, List<ASTType>>(pred, one(ASTIntType.get(1,ltype.getLabel().join(rtype.getLabel()))));
 		} else if(!ltype.isNullable() && rtype.isNullable()) {
 			if(rememberPredicate) {
 				this.currentUnNullExp.add(right.left.toString());
@@ -313,25 +313,25 @@ public class NullableRewriter extends DefaultStatementExpressionVisitor<ASTState
 			binaryPredicate.right = new ASTGetValueExpression(HandleWay.GetValue, right.left);
 			ASTBinaryPredicate cond = new ASTBinaryPredicate(right.left, REL_OP.NEQ, new ASTNullExpression());
 			ASTPredicate pred = new ASTAndPredicate(cond, binaryPredicate);
-			return new Pair<ASTExpression, List<ASTType>>(pred, one(ASTIntType.get(1, ltype.getLabel().meet(rtype.getLabel()),ltype.getCount().meet(rtype.getCount()))));
+			return new Pair<ASTExpression, List<ASTType>>(pred, one(ASTIntType.get(1,ltype.getLabel().join(rtype.getLabel()))));
 		} else {
 			// !ltype.isNullable && !rtype.isNullable()
 			binaryPredicate.left = left.left;
 			binaryPredicate.right = binaryPredicate.right;
-			return new Pair<ASTExpression, List<ASTType>>(binaryPredicate, one(ASTIntType.get(1, ltype.getLabel().meet(rtype.getLabel()),ltype.getCount().meet(rtype.getCount()))));
+			return new Pair<ASTExpression, List<ASTType>>(binaryPredicate, one(ASTIntType.get(1, ltype.getLabel().join(rtype.getLabel()))));
 		}
 	}
 
 	@Override
 	public Pair<ASTExpression, List<ASTType>> visit(
 			ASTConstantExpression constantExpression) {
-		return new Pair<ASTExpression, List<ASTType>>(constantExpression, one(ASTIntType.get(32, ASTLabel.Pub, ASTCount.One)));
+		return new Pair<ASTExpression, List<ASTType>>(constantExpression, one(ASTIntType.get(32, ASTLabel.Pub)));
 	}
 
 	@Override
 	public Pair<ASTExpression, List<ASTType>> visit(
 			ASTFloatConstantExpression constantExpression) {
-		return new Pair<ASTExpression, List<ASTType>>(constantExpression, one(ASTFloatType.get(32, ASTLabel.Pub, ASTCount.One)));
+		return new Pair<ASTExpression, List<ASTType>>(constantExpression, one(ASTFloatType.get(32, ASTLabel.Pub)));
 	}
 
 	@Override
@@ -426,7 +426,7 @@ public class NullableRewriter extends DefaultStatementExpressionVisitor<ASTState
 			tuple.exp = new ASTGetValueExpression(checkExpression(var.left), var.left);
 		} else
 			tuple.exp = var.left;
-		return new Pair<ASTExpression, List<ASTType>>(tuple, one(ASTIntType.get(32, ASTLabel.Pub, ASTCount.One)));
+		return new Pair<ASTExpression, List<ASTType>>(tuple, one(ASTIntType.get(32, ASTLabel.Pub)));
 	}
 
 	@Override
@@ -440,7 +440,7 @@ public class NullableRewriter extends DefaultStatementExpressionVisitor<ASTState
 				tuple.ranger == null ? new ASTConstantExpression(1) :
 					new ASTBinaryExpression(tuple.ranger, BOP.SUB, tuple.rangel)
 				, 
-				var.right.get(0).getLabel(),var.right.get(0).getCount())));
+				var.right.get(0).getLabel())));
 	}
 
 	@Override
@@ -481,7 +481,7 @@ public class NullableRewriter extends DefaultStatementExpressionVisitor<ASTState
 	@Override
 	public Pair<ASTExpression, List<ASTType>> visit(ASTSizeExpression exp) {
 		return new Pair<ASTExpression, List<ASTType>>(exp, 
-				one(ASTIntType.get(32, ASTLabel.Pub,ASTCount.One)));
+				one(ASTIntType.get(32, ASTLabel.Pub)));
 	}
 
 	@Override

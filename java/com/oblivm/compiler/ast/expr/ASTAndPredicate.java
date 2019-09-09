@@ -10,10 +10,12 @@ package com.oblivm.compiler.ast.expr;
 public class ASTAndPredicate extends ASTPredicate {
 	public ASTPredicate left;
 	public ASTPredicate right;
-	
+	public ASTCount cnt;
 	public ASTAndPredicate(ASTPredicate left, ASTPredicate right) {
 		this.left = left;
 		this.right = right;
+		// counts need to be equal on both sides
+		this.cnt=right.getCount();
 	}
 	
 	public String toString() {
@@ -27,5 +29,11 @@ public class ASTAndPredicate extends ASTPredicate {
 	
 	public ASTAndPredicate cloneInternal() {
 		return new ASTAndPredicate(left.clone(), right.clone());
+	}
+
+	@Override
+	public ASTCount getCount() {
+		// TODO Auto-generated method stub
+		return cnt;
 	}
 }

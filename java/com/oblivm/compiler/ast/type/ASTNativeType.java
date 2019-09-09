@@ -5,6 +5,7 @@ package com.oblivm.compiler.ast.type;
 
 import java.util.List;
 
+import com.oblivm.compiler.ast.expr.ASTCount;
 import com.oblivm.compiler.ast.expr.ASTExpression;
 
 public class ASTNativeType extends ASTType {
@@ -52,7 +53,7 @@ public class ASTNativeType extends ASTType {
 		return isPhantom ? ASTLabel.Secure : ASTLabel.Pub;
 	}
 	// no clear reason to do zero accesses/
-	public ASTCount getCount() {
+/*	public ASTCount getCount() {
 		return ASTCount.Zero;
-	}
+	}*/
 }

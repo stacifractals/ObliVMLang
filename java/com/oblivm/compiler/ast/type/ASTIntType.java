@@ -4,13 +4,14 @@
 package com.oblivm.compiler.ast.type;
 
 import com.oblivm.compiler.ast.expr.ASTConstantExpression;
+import com.oblivm.compiler.ast.expr.ASTCount;
 import com.oblivm.compiler.ast.expr.ASTExpression;
 
 public class ASTIntType extends ASTType {
 
 	public ASTExpression bit;
 	private ASTLabel lab;
-	private ASTCount cnt;
+	//private ASTCount cnt;
 
 	public ASTExpression getBits() {
 		return bit;
@@ -20,18 +21,18 @@ public class ASTIntType extends ASTType {
 		return lab;
 	}
 
-	public static ASTIntType get(int bit, ASTLabel lab, ASTCount cnt) {
-		return ASTIntType.get(new ASTConstantExpression(bit), lab, cnt);
+	public static ASTIntType get(int bit, ASTLabel lab) {
+		return ASTIntType.get(new ASTConstantExpression(bit), lab);
 	}
 
-	public static ASTIntType get(ASTExpression bit, ASTLabel lab, ASTCount cnt) {
-		return new ASTIntType(bit, lab, cnt);
+	public static ASTIntType get(ASTExpression bit, ASTLabel lab) {
+		return new ASTIntType(bit, lab);
 	}
 
-	private ASTIntType(ASTExpression bit, ASTLabel lab, ASTCount cnt) {
+	private ASTIntType(ASTExpression bit, ASTLabel lab) {
 		this.bit = bit;
 		this.lab = lab;
-		this.cnt=cnt;
+	//	this.cnt=cnt;
 	}
 
 	public String toString(int indent) {
@@ -49,7 +50,7 @@ public class ASTIntType extends ASTType {
 		if(!(obj instanceof ASTIntType))
 			return false;
 		ASTIntType other = (ASTIntType)obj;
-		return bit.equals(other.bit) && lab == other.lab && cnt==other.cnt;
+		return bit.equals(other.bit) && lab == other.lab;
 	}
 //did not add in count for flow. 
 	@Override
@@ -62,9 +63,9 @@ public class ASTIntType extends ASTType {
 		} else if(type instanceof ASTIntType) {
 			ASTIntType it = (ASTIntType)type;
 			boolean labely=this.lab.less(it.lab);
-			boolean county=this.cnt.equal(it.cnt);
+		//	boolean county=this.cnt.equal(it.cnt);
 			System.out.print(this.toString());
-			if(labely=true&&county==true) {
+			if(labely=true) {
 				return true;
 			}
 			else {	return false;}
@@ -77,11 +78,11 @@ public class ASTIntType extends ASTType {
 		return toString();
 	}
 
-	public ASTCount getCount() {
+/*	public ASTCount getCount() {
 		// TODO Auto-generated method stub
 		return cnt;
 	}
-
+*/
 
 
 }

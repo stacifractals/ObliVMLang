@@ -15,6 +15,7 @@ import com.oblivm.compiler.ast.expr.ASTBinaryExpression;
 import com.oblivm.compiler.ast.expr.ASTBinaryExpression.BOP;
 import com.oblivm.compiler.ast.expr.ASTBinaryPredicate;
 import com.oblivm.compiler.ast.expr.ASTConstantExpression;
+import com.oblivm.compiler.ast.expr.ASTCount;
 import com.oblivm.compiler.ast.expr.ASTExpression;
 import com.oblivm.compiler.ast.expr.ASTFloatConstantExpression;
 import com.oblivm.compiler.ast.expr.ASTFuncExpression;
@@ -39,7 +40,6 @@ import com.oblivm.compiler.ast.stmt.ASTStatement;
 import com.oblivm.compiler.ast.stmt.ASTUsingStatement;
 import com.oblivm.compiler.ast.stmt.ASTWhileStatement;
 import com.oblivm.compiler.ast.type.ASTArrayType;
-import com.oblivm.compiler.ast.type.ASTCount;
 import com.oblivm.compiler.ast.type.ASTFloatType;
 import com.oblivm.compiler.ast.type.ASTFunctionType;
 import com.oblivm.compiler.ast.type.ASTIntType;
@@ -279,7 +279,7 @@ public class BitInferenceEngine  extends DefaultStatementExpressionVisitor<Void,
 				throw new RuntimeException("Bits doesn't match! "+left+"\t"+right);
 		}
 		//visit 1 bit on each side. 
-		current = ASTIntType.get(1, ASTLabel.Secure, ASTCount.Two);
+		current = ASTIntType.get(1, ASTLabel.Secure);
 		return getCurrentBits();
 	}
 
@@ -349,14 +349,15 @@ public class BitInferenceEngine  extends DefaultStatementExpressionVisitor<Void,
 			}
 		}
 		//visiting 2 sides of predidcate
-		this.current = ASTIntType.get(1, ASTLabel.Secure, ASTCount.Two);
+		this.current = ASTIntType.get(1, ASTLabel.Secure);
 		return getCurrentBits();
 	}
 
 	@Override
 	//visiting 1 side. 
 	public ASTExpression visit(ASTConstantExpression constantExpression) {
-		this.current = ASTIntType.get(constantExpression.bitSize, ASTLabel.Pub, ASTCount.One);
+		this.current = ASTIntType.get(constantExpression.bitSize, ASTLabel.Pub);
+		System.out.print("In Constant \n");
 		return constantExpression.bitSize;
 	}
 
@@ -422,7 +423,7 @@ public class BitInferenceEngine  extends DefaultStatementExpressionVisitor<Void,
 				throw new RuntimeException("Bits doesn't match! "+left+"\t"+right);
 		}
 		//accessing both sides. 
-		current = ASTIntType.get(1, ASTLabel.Secure, ASTCount.Two);
+		current = ASTIntType.get(1, ASTLabel.Secure);
 		return getCurrentBits();
 	}
 
@@ -518,7 +519,7 @@ public class BitInferenceEngine  extends DefaultStatementExpressionVisitor<Void,
 	@Override
 	public ASTExpression visit(ASTFloatConstantExpression constantExpression) {
 		//visiting so 1 access
-		this.current = ASTFloatType.get(constantExpression.bitSize, ASTLabel.Pub, ASTCount.One);
+		this.current = ASTFloatType.get(constantExpression.bitSize, ASTLabel.Pub);
 		return constantExpression.bitSize;
 	}
 
@@ -561,7 +562,7 @@ public class BitInferenceEngine  extends DefaultStatementExpressionVisitor<Void,
 	@Override
 	public ASTExpression visit(ASTSizeExpression exp) {
 		//visiting one
-		this.current = ASTIntType.get(32, ASTLabel.Pub, ASTCount.One);
+		this.current = ASTIntType.get(32, ASTLabel.Pub);
 		return new ASTConstantExpression(32);
 	}
 

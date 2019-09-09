@@ -90,7 +90,7 @@ public class ASTFunctionType extends ASTType {
 		return this.isPhantom ? ASTLabel.Secure : ASTLabel.Pub;
 	}
 	//access at least once, no real reason.
-	public ASTCount getCount() {
-	return ASTCount.One;	
-	}
+//	public ASTCount getCount() {
+	//return ASTCount.One;	
+	//}
 }

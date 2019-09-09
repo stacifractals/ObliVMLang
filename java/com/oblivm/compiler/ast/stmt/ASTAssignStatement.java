@@ -3,6 +3,7 @@
  */
 package com.oblivm.compiler.ast.stmt;
 
+import com.oblivm.compiler.ast.expr.ASTCount;
 import com.oblivm.compiler.ast.expr.ASTExpression;
 
 /**
@@ -14,10 +15,12 @@ import com.oblivm.compiler.ast.expr.ASTExpression;
 public class ASTAssignStatement extends ASTStatement {
 	public ASTExpression var;
 	public ASTExpression expr;
-	
+	public ASTCount cnt;
 	public ASTAssignStatement(ASTExpression v, ASTExpression e) {
 		this.var = v;
 		this.expr = e;
+		//as many counts as required for the expression
+		this.cnt=e.getCount();
 	}
 
 	@Override
@@ -31,5 +34,11 @@ public class ASTAssignStatement extends ASTStatement {
 	
 	public String toString() {
 		return var+"="+expr.toString(0)+";";
+	}
+
+	@Override
+	public ASTCount getCount() {
+		// TODO Auto-generated method stub
+		return cnt;
 	}
 }

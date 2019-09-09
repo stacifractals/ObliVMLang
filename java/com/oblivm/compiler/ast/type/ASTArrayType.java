@@ -3,6 +3,7 @@
  */
 package com.oblivm.compiler.ast.type;
 
+import com.oblivm.compiler.ast.expr.ASTCount;
 import com.oblivm.compiler.ast.expr.ASTExpression;
 
 /**
@@ -13,13 +14,13 @@ public class ASTArrayType extends ASTType {
 	public ASTExpression size;
 	public ASTType type;
 	public ASTLabel lab;
-	public ASTCount cnt;
+	//public ASTCount cnt;
 	
-	public ASTArrayType(ASTType type, ASTExpression s, ASTLabel lab, ASTCount cnt) {
+	public ASTArrayType(ASTType type, ASTExpression s, ASTLabel lab) {
 		this.lab = lab;
 		this.type = type;
 		this.size = s;
-		this.cnt=cnt;
+		//this.cnt=cnt;
 	}
 
 	@Override
@@ -54,9 +55,9 @@ public class ASTArrayType extends ASTType {
 			throw new RuntimeException("Array type "+this.shortName()+" is invalid.");
 		return lab;
 	}
-	public ASTCount getCount() {
-		if(!cnt.less(type.getCount()))
+/*	public ASTCount getCount() {
+		if(!cnt.equal(type.getCount()))
 			throw new RuntimeException("Array type "+this.shortName()+" is invalid.");
 		return cnt;
-	}
+	}*/
 }
