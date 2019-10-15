@@ -357,7 +357,7 @@ public class BitInferenceEngine  extends DefaultStatementExpressionVisitor<Void,
 	//visiting 1 side. 
 	public ASTExpression visit(ASTConstantExpression constantExpression) {
 		this.current = ASTIntType.get(constantExpression.bitSize, ASTLabel.Pub);
-		System.out.print("In Constant \n");
+		//System.out.print("In Constant \n");
 		return constantExpression.bitSize;
 	}
 

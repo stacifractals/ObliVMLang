@@ -164,7 +164,7 @@ public class FrontendCompiler extends DefaultVisitor<IRCode, Pair<List<Variable>
 			System.exit(1);
 		}
 		Info.LOG.log("The program type checks");
-		System.out.print("In Compiler FrontEnd \n");
+		//s("In Compiler FrontEnd \n");
 		return translate(program);
 	}
 
