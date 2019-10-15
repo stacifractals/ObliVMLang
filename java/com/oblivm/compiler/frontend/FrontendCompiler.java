@@ -974,27 +974,7 @@ public class FrontendCompiler extends DefaultVisitor<IRCode, Pair<List<Variable>
 				return null;
 			for(ASTFunction func : program.functionDef) {
 				if(func.name.equals(name) && func.baseType.instance(baseType)) {
-					// This piece of code should be wasted
-					//					tc.resolver.resolvingSet = new HashSet<String>();
-					//					tc.resolver.typeVars = new HashMap<String, ASTType>();
-					//					if(this.function.baseType != null) {
-					//						ASTRecType rt = (ASTRecType)this.function.baseType;
-					//						if(rt.typeVariables != null) {
-					//							for(int i = 0; i<rt.typeVariables.size(); ++i) {
-					//								ASTVariableType vt = (ASTVariableType)rt.typeVariables.get(i);
-					//								tc.resolver.typeVars.put(vt.var, vt);
-					//							}
-					//						}
-					//					}
-					//					if(baseType instanceof ASTRecType) {
-					//						ASTRecType rt = (ASTRecType)func.baseType;
-					//						if(rt.typeVariables != null) {
-					//							for(int i = 0; i<rt.typeVariables.size(); ++i) {
-					//								ASTVariableType vt = (ASTVariableType)rt.typeVariables.get(i);
-					//								tc.resolver.typeVars.put(vt.var, ((ASTRecType)baseType).typeVariables.get(i));
-					//							}
-					//						}
-					//					}
+				
 					Type ty = visit(funcExpression.type);
 					if(func.isDummy) {
 						if(this.currentCond == null) {
