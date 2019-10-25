@@ -299,6 +299,14 @@ public class TypeChecker extends DefaultStatementExpressionVisitor<Boolean, List
 	@Override
 	public Boolean visit(ASTIfStatement ifStatement) {
 		ASTLabel old = secureContext;
+		ASTCount cnt=ifStatement.tcnt;
+		if(cnt.equal(ifStatement.fcnt)) {
+			System.out.println("Counts equal");
+		}
+		else
+		{
+			return false;
+		}
 		ASTType ty = assertOne(visit(ifStatement.cond));
 		bcon.process(ty, ifStatement.cond);
 		//accessing once b/c conditional needs to be that

@@ -65,12 +65,45 @@ public class NoClass<t__T> implements IWritable<NoClass<t__T>, t__T>, ISecureRun
 		return ret;
 	}
 
-	public void main(int n, int m, t__T[] x) throws Exception {
-		t__T[] x = env.inputOfAlice(Utils.fromInt(0, 32));
+	public t__T[] main(int n, int m, t__T[] x, t__T[] y) throws Exception {
+		SecureArray<t__T> alc = new SecureArray<t__T>(env, (n)/(32), 32);
+		for(int _j_2 = 0; _j_2 < (n)/(32); ++_j_2) {
+			alc.write(intLib.toSignals(_j_2), env.inputOfAlice(Utils.fromInt(0, 32)));
+		}
+		int N = 0;
+		t__T[] flt = env.inputOfAlice(Utils.fromInt(0, 32));
 		t__T[] _t_state = env.inputOfAlice(Utils.fromInt(0, 32));
 		t__T _t_state_new = env.inputOfAlice(false);
 		t__T[] _t_count = env.inputOfAlice(Utils.fromInt(0, 32));
-		int __tmp0 = 2;
-		x = env.inputOfAlice(Utils.fromInt(__tmp0, 32));
+		int __tmp0 = 32;
+		int f_tmp_1 = n / __tmp0;
+		int __tmp1 = f_tmp_1;
+		N = __tmp1;
+		int __tmp2 = 0;
+		flt = env.inputOfAlice(Utils.fromInt(__tmp2, 32));
+		int __tmp3 = 0;
+		boolean f_tmp_4 = N > __tmp3;
+		boolean __tmp4 = f_tmp_4;
+		if(__tmp4) {
+			int __tmp5 = ((n & ((1<<(((32)*((N)-(1)))+(32))) - 1))>>((32)*((N)-(1))));
+			int __tmp6 = __tmp5;
+			int __tmp7 = 0;
+			t__T[] f_tmp_6 = env.inputOfAlice(Utils.fromInt(__tmp7, 32));
+			t__T[] f_tmp_7 = env.inputOfAlice(Utils.fromInt(__tmp6, 32));
+			alc.write(f_tmp_6,f_tmp_7);
+			int __tmp8 = 0;
+			int __tmp9 = 0;
+			t__T[] f_tmp_10 = env.inputOfAlice(Utils.fromInt(__tmp9, 32));
+			t__T[] f_tmp_11 = env.inputOfAlice(Utils.fromInt(__tmp8, 32));
+			alc.write(f_tmp_10,f_tmp_11);
+		} else {
+			int __tmp10 = 0;
+			int __tmp11 = 0;
+			t__T[] f_tmp_14 = env.inputOfAlice(Utils.fromInt(__tmp11, 32));
+			t__T[] f_tmp_15 = env.inputOfAlice(Utils.fromInt(__tmp10, 32));
+			alc.write(f_tmp_14,f_tmp_15);
+		}
+		return flt;
 
 	}
+}

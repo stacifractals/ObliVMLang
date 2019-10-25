@@ -19,8 +19,8 @@ public class ASTIfStatement extends ASTStatement {
 	public List<ASTStatement> trueBranch;
 	public List<ASTStatement> falseBranch;
 	public ASTCount cnt;
-	public ASTCount tcnt;
-	public ASTCount fcnt;
+	public ASTCount tcnt=ASTCount.Zero;
+	public ASTCount fcnt=ASTCount.Zero;
 	public ASTIfStatement(ASTPredicate cond) {
 		this.cond = cond;
 		//add count to be that of the predicate.
@@ -34,9 +34,10 @@ public class ASTIfStatement extends ASTStatement {
 		if(falseBranch.size() == 0) {
 			fcnt=ASTCount.Zero;
 		} else {
-			for(int i=0; i<falseBranch.size(); ++i)
+			for(int i=0; i<falseBranch.size(); ++i) {
 				fcnt.join(falseBranch.get(i).getCount());
-
+			System.out.println("If Statement Count is" + falseBranch.get(i).getCount() );
+	}
 		}
 	}
 	

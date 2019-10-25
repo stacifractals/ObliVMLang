@@ -64,7 +64,7 @@ public class ASTIntType extends ASTType {
 			ASTIntType it = (ASTIntType)type;
 			boolean labely=this.lab.less(it.lab);
 		//	boolean county=this.cnt.equal(it.cnt);
-			System.out.print(this.toString());
+			//System.out.print(this.toString());
 			if(labely=true) {
 				return true;
 			}
