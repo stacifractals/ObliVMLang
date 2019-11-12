@@ -20,6 +20,7 @@ import com.oblivm.compiler.ast.expr.ASTBinaryExpression.BOP;
 import com.oblivm.compiler.ast.expr.ASTBinaryPredicate;
 import com.oblivm.compiler.ast.expr.ASTBinaryPredicate.REL_OP;
 import com.oblivm.compiler.ast.expr.ASTConstantExpression;
+import com.oblivm.compiler.ast.expr.ASTCount;
 import com.oblivm.compiler.ast.expr.ASTExpression;
 import com.oblivm.compiler.ast.expr.ASTFloatConstantExpression;
 import com.oblivm.compiler.ast.expr.ASTFuncExpression;
@@ -99,6 +100,7 @@ import com.oblivm.compiler.ir.Variable;
 import com.oblivm.compiler.ir.While;
 import com.oblivm.compiler.log.Bugs;
 import com.oblivm.compiler.log.Info;
+import com.oblivm.compiler.statement.manage.Count;
 import com.oblivm.compiler.type.manage.ArrayType;
 import com.oblivm.compiler.type.manage.BOPVariableConstant;
 import com.oblivm.compiler.type.manage.BitVariable;
@@ -141,6 +143,7 @@ public class FrontendCompiler extends DefaultVisitor<IRCode, Pair<List<Variable>
 	}
 
 	public IRCode visit(ASTStatement statement) {
+		System.out.println("Statement Visitor");
 		if(statement instanceof ASTBranchStatement) {
 			return visit((ASTBranchStatement)statement);
 		} else {
@@ -191,7 +194,7 @@ public class FrontendCompiler extends DefaultVisitor<IRCode, Pair<List<Variable>
 		for(ASTFunction function : program.functionDef) {
 			if(function.baseType == null) {
 				Type ty = visit(function.getType());
-				func.put(function.name, new Variable(ty, Label.Pub, function.name));
+				func.put(function.name, new Variable(ty, Label.Pub, Count.Zero, function.name));
 			}
 		}
 
@@ -224,28 +227,28 @@ public class FrontendCompiler extends DefaultVisitor<IRCode, Pair<List<Variable>
 				method.code = new Skip();
 				this.variableValues = new HashMap<String, Variable>(func);
 				if(baseType != null) {
-					this.variableValues.put("this", new Variable(baseType, baseType.getLabel(), "this"));
+					this.variableValues.put("this", new Variable(baseType, baseType.getLabel(), Count.Zero, "this"));
 					if(baseType instanceof RecordType) {
 						RecordType rt = (RecordType)baseType;
 						for(VariableConstant vc : rt.bits) {
 							String s = ((BitVariable)vc).var;
-							this.variableValues.put(s, new Variable(new IntType(32, Label.Pub), Label.Pub, s));
+							this.variableValues.put(s, new Variable(new IntType(32, Label.Pub), Label.Pub, Count.Zero, s));
 						}
 						for(Map.Entry<String, Type> ent : rt.fields.entrySet()) {
-							this.variableValues.put(ent.getKey(), new Variable(ent.getValue(), ent.getValue().getLabel(), ent.getKey()));
+							this.variableValues.put(ent.getKey(), new Variable(ent.getValue(), ent.getValue().getLabel(), Count.Zero, ent.getKey()));
 						}
 					}
 				}
 				for(String v : this.function.bitParameter) {
-					this.variableValues.put(v, new Variable(new IntType(32, Label.Pub), Label.Pub, v));
+					this.variableValues.put(v, new Variable(new IntType(32, Label.Pub), Label.Pub, Count.Zero, v));
 				}
 				for(Pair<ASTType, String> arg : this.function.inputVariables) {
 					Type type = visit(arg.left);
-					this.variableValues.put(arg.right, new Variable(type, type.getLabel(), arg.right));
+					this.variableValues.put(arg.right, new Variable(type, type.getLabel(), Count.Zero, arg.right));
 				}
 				for(Pair<ASTType, String> arg : this.function.localVariables) {
 					Type type = visit(arg.left);
-					this.variableValues.put(arg.right, new Variable(type, type.getLabel(), arg.right));
+					this.variableValues.put(arg.right, new Variable(type, type.getLabel(), Count.Zero, arg.right));
 				}
 				this.phantom = function.isDummy;
 				method.isPhantom = phantom;
@@ -363,10 +366,11 @@ public class FrontendCompiler extends DefaultVisitor<IRCode, Pair<List<Variable>
 
 	private static Variable getPhantomVariable() {
 		if(phantomVariable == null) {
-			phantomVariable =
-					new Variable(new IntType(1, Label.Secure), Label.Secure, Config.phantomVariable);
+		//	phantomVariable =
+			//		new Variable(new IntType(1, Label.Secure), Label.Secure, Count.Zero, Config.phantomVariable);
 		}
-		return phantomVariable;
+		return null;
+		//return phantomVariable;
 	}
 
 	public IRCode translateAssign(ASTArrayExpression exp, Variable value) {
@@ -382,10 +386,10 @@ public class FrontendCompiler extends DefaultVisitor<IRCode, Pair<List<Variable>
 					new ArrayAssign(at.indexLab.lab, v, i, value));
 		} else {
 			Type type = at.type;
-			Variable dumb = new Variable(type, type.getLabel(), newTempVar());
-			code = Seq.seq(code, new Assign(dumb.lab, dumb, new ArrayExp(v, i)));
-			Variable dumb1 = new Variable(type, Label.Secure, newTempVar());
-			code = Seq.seq(code, new Assign(Label.Secure, dumb1, 
+			Variable dumb = new Variable(type, type.getLabel(), Count.Zero, newTempVar());
+			code = Seq.seq(code, new Assign(dumb.lab, dumb.cnt, dumb, new ArrayExp(v, i)));
+			Variable dumb1 = new Variable(type, Label.Secure, Count.Zero, newTempVar());
+			code = Seq.seq(code, new Assign(Label.Secure, Count.Zero, dumb1, 
 					new MuxExp(this.currentCond == null? getPhantomVariable() : this.currentCond, value, dumb)));
 			code = Seq.seq(code,
 					new ArrayAssign(at.indexLab.lab, v, i, dumb1));
@@ -406,10 +410,10 @@ public class FrontendCompiler extends DefaultVisitor<IRCode, Pair<List<Variable>
 			Type type = new IntType(
 					rr == null ? new Constant(1) : new BOPVariableConstant(rr, Op.Sub, ll), 
 							v.lab);
-			Variable dumb = new Variable(type, type.getLabel(), newTempVar());
-			code = Seq.seq(code, new Assign(dumb.lab, dumb, new RangeExp(dumb.lab, v, ll, rr)));
-			Variable dumb1 = new Variable(type, Label.Secure, newTempVar());
-			code = Seq.seq(code, new Assign(Label.Secure, dumb1, new MuxExp(
+			Variable dumb = new Variable(type, type.getLabel(), Count.Zero, newTempVar());
+			code = Seq.seq(code, new Assign(dumb.lab, Count.Zero, dumb, new RangeExp(dumb.lab, v, ll, rr)));
+			Variable dumb1 = new Variable(type, Label.Secure, Count.Zero, newTempVar());
+			code = Seq.seq(code, new Assign(Label.Secure, Count.Zero, dumb1, new MuxExp(
 					this.currentCond == null ? getPhantomVariable() : currentCond, value, dumb)));
 			code = Seq.seq(code,
 					new RangeAssign(v.lab, v, ll, rr, dumb1));
@@ -422,10 +426,10 @@ public class FrontendCompiler extends DefaultVisitor<IRCode, Pair<List<Variable>
 			return new RecordAssign(base.type.getLabel(), base, field, value);
 		} else {
 			Type type = ((RecordType)base.type).fields.get(field);
-			Variable dumb = new Variable(type, type.getLabel(), newTempVar());
-			IRCode code = new Assign(dumb.lab, dumb, new RecExp(type.getLabel(), base, field));
-			Variable dumb1 = new Variable(type, Label.Secure, newTempVar());
-			code = Seq.seq(code, new Assign(Label.Secure, dumb1, 
+			Variable dumb = new Variable(type, type.getLabel(), Count.Zero, newTempVar());
+			IRCode code = new Assign(dumb.lab, Count.Zero, dumb, new RecExp(type.getLabel(), base, field));
+			Variable dumb1 = new Variable(type, Label.Secure, Count.Zero, newTempVar());
+			code = Seq.seq(code, new Assign(Label.Secure, Count.Zero, dumb1, 
 					new MuxExp(this.currentCond == null ? getPhantomVariable() : currentCond, value, dumb)));
 			code = Seq.seq(code,
 					new RecordAssign(base.type.getLabel(), base, field, dumb1));
@@ -473,14 +477,14 @@ public class FrontendCompiler extends DefaultVisitor<IRCode, Pair<List<Variable>
 		Variable v = tmp.left.get(0);
 		if(this.currentCond == null && (!this.phantom || v.lab == Label.Pub)) {
 			code = Seq.seq(code,
-					new Assign(v.type.getLabel(), v, new VarExp(value)));
+					new Assign(v.type.getLabel(),v.cnt, v, new VarExp(value)));
 		} else {
 			Type type = v.type;
-			Variable dumb = new Variable(type, Label.Secure, newTempVar());
-			code = Seq.seq(code, new Assign(Label.Secure, dumb, 
+			Variable dumb = new Variable(type, Label.Secure, Count.Zero, newTempVar());
+			code = Seq.seq(code, new Assign(Label.Secure, Count.Zero, dumb, 
 					new MuxExp(this.currentCond == null ? getPhantomVariable() : currentCond, value, v)));
 			code = Seq.seq(code,
-					new Assign(v.type.getLabel(), v, new VarExp(dumb)));
+					new Assign(v.type.getLabel(), v.cnt, v, new VarExp(dumb)));
 		}
 		return code;
 	}
@@ -488,44 +492,44 @@ public class FrontendCompiler extends DefaultVisitor<IRCode, Pair<List<Variable>
 	public IRCode visit(ASTBranchStatement stmt) {
 		if(stmt.pred == null) {
 			Variable var = this.variableValues.get(stmt.stateVar+"_new");
-			Variable tmp = new Variable(var.type, var.lab, newTempVar());
-			IRCode code = new Assign(Label.Secure, tmp, new ConstExp(stmt.goTrue.getId(), var.getBits())); 
+			Variable tmp = new Variable(var.type, var.lab, var.cnt, newTempVar());
+			IRCode code = new Assign(Label.Secure, Count.Zero, tmp, new ConstExp(stmt.goTrue.getId(), var.getBits())); 
 			if(this.currentCond == null && (!this.phantom || var.lab == Label.Pub)) {
 				code = Seq.seq(code,
-						new Assign(var.type.getLabel(), var, new VarExp(tmp)));
+						new Assign(var.type.getLabel(), var.cnt, var, new VarExp(tmp)));
 			} else {
 				Type type = var.type;
-				Variable dumb = new Variable(type, Label.Secure, newTempVar());
-				code = Seq.seq(code, new Assign(Label.Secure, dumb, 
+				Variable dumb = new Variable(type, Label.Secure,Count.Zero, newTempVar());
+				code = Seq.seq(code, new Assign(Label.Secure, Count.Zero, dumb, 
 						new MuxExp(this.currentCond == null ? getPhantomVariable() : currentCond, tmp, var)));
 				code = Seq.seq(code,
-						new Assign(var.type.getLabel(), var, new VarExp(dumb)));
+						new Assign(var.type.getLabel(), var.cnt, var, new VarExp(dumb)));
 			}
 			return code;
 		} else {
 			Variable var = this.variableValues.get(stmt.stateVar+"_new");
-			Variable tmp = new Variable(var.type, var.lab, newTempVar());
+			Variable tmp = new Variable(var.type, var.lab, var.cnt, newTempVar());
 			Pair<List<Variable>, IRCode> value = visit(stmt.pred);
 			IRCode code = value.right;
-			Variable tr = new Variable(var.type, var.lab, newTempVar());
-			Variable fs = new Variable(var.type, var.lab, newTempVar());
+			Variable tr = new Variable(var.type, var.lab, var.cnt, newTempVar());
+			Variable fs = new Variable(var.type, var.lab,var.cnt, newTempVar());
 			code = Seq.seq(code,
-					new Assign(Label.Secure, tr, new ConstExp(stmt.goTrue.getId(), var.getBits()))); 
+					new Assign(Label.Secure, Count.Zero, tr, new ConstExp(stmt.goTrue.getId(), var.getBits()))); 
 			code = Seq.seq(code,
-					new Assign(Label.Secure, fs, new ConstExp(stmt.goFalse.getId(), var.getBits()))); 
+					new Assign(Label.Secure, Count.Zero, fs, new ConstExp(stmt.goFalse.getId(), var.getBits()))); 
 			code = Seq.seq(code,
-					new Assign(Label.Secure, tmp, new MuxExp(value.left.get(0), tr, fs)));
+					new Assign(Label.Secure, Count.Zero, tmp, new MuxExp(value.left.get(0), tr, fs)));
 			
 			if(this.currentCond == null && (!this.phantom || var.lab == Label.Pub)) {
 				code = Seq.seq(code,
-						new Assign(var.type.getLabel(), var, new VarExp(tmp)));
+						new Assign(var.type.getLabel(), var.cnt, var, new VarExp(tmp)));
 			} else {
 				Type type = var.type;
-				Variable dumb = new Variable(type, Label.Secure, newTempVar());
-				code = Seq.seq(code, new Assign(Label.Secure, dumb, 
+				Variable dumb = new Variable(type, Label.Secure, Count.Zero, newTempVar());
+				code = Seq.seq(code, new Assign(Label.Secure,Count.Zero, dumb, 
 						new MuxExp(this.currentCond == null ? getPhantomVariable() : currentCond, tmp, var)));
 				code = Seq.seq(code,
-						new Assign(var.type.getLabel(), var, new VarExp(dumb)));
+						new Assign(var.type.getLabel(), var.cnt, var, new VarExp(dumb)));
 			}
 			return code;
 		}
@@ -533,10 +537,14 @@ public class FrontendCompiler extends DefaultVisitor<IRCode, Pair<List<Variable>
 
 	@Override
 	public IRCode visit(ASTAssignStatement stmt) {
+		//System.out.println("Statement Assign Visitor");
 		Pair<List<Variable>, IRCode> res = visit(stmt.expr);
 		IRCode code = res.right;
+		stmt.var.cnt=ASTCount.One;
+	//	System.out.println(stmt.var.cnt);
 		if(res.left.size() == 1) {
 			Variable value = res.left.get(0);
+		
 			if(stmt.var instanceof ASTArrayExpression) {
 				return Seq.seq(code, translateAssign((ASTArrayExpression)stmt.var, value));
 			} else if(stmt.var instanceof ASTRecExpression) {
@@ -574,6 +582,7 @@ public class FrontendCompiler extends DefaultVisitor<IRCode, Pair<List<Variable>
 
 	@Override
 	public IRCode visit(ASTIfStatement ifStatement) {
+		System.out.println("Statement If Visitor");
 		Pair<List<Variable>, IRCode> value = visit(ifStatement.cond);
 		if(value.left.get(0).lab == Label.Secure || currentCond != null) {
 			IRCode ret = value.right;
@@ -583,8 +592,8 @@ public class FrontendCompiler extends DefaultVisitor<IRCode, Pair<List<Variable>
 			if(currentCond == null) {
 				this.currentCond = value.left.get(0);
 			} else {
-				Variable var = new Variable(new IntType(1, Label.Secure), Label.Secure, newTempVar());
-				ret = Seq.seq(ret, new Assign(Label.Secure, var, new BopExp(this.currentCond, BopExp.Op.And, value.left.get(0))));
+				Variable var = new Variable(new IntType(1, Label.Secure), Label.Secure, Count.One, newTempVar());
+				ret = Seq.seq(ret, new Assign(Label.Secure, Count.One, var, new BopExp(this.currentCond, BopExp.Op.And, value.left.get(0))));
 				this.currentCond = var;
 			}
 			IRCode tb = new Skip();
@@ -597,13 +606,13 @@ public class FrontendCompiler extends DefaultVisitor<IRCode, Pair<List<Variable>
 			if(ifStatement.falseBranch.size() > 0) {
 				if(currentCond == null && this.phantom)
 					this.currentCond = getPhantomVariable();
-				Variable neg = new Variable(new IntType(1, Label.Secure), Label.Secure, newTempVar());
-				ret = Seq.seq(ret, new Assign(Label.Secure, neg, new UnaryOpExp(UnaryOpExp.Op.Neg, value.left.get(0))));
+				Variable neg = new Variable(new IntType(1, Label.Secure), Label.Secure, Count.One, newTempVar());
+				ret = Seq.seq(ret, new Assign(Label.Secure, Count.One, neg, new UnaryOpExp(UnaryOpExp.Op.Neg, value.left.get(0))));
 				if(currentCond == null) {
 					this.currentCond = neg;
 				} else {
-					Variable var = new Variable(new IntType(1, Label.Secure), Label.Secure, newTempVar());
-					ret = Seq.seq(ret, new Assign(Label.Secure, var, new BopExp(this.currentCond, BopExp.Op.And, neg)));
+					Variable var = new Variable(new IntType(1, Label.Secure), Label.Secure, Count.One, newTempVar());
+					ret = Seq.seq(ret, new Assign(Label.Secure, Count.One, var, new BopExp(this.currentCond, BopExp.Op.And, neg)));
 					this.currentCond = var;
 				}
 				IRCode fb = new Skip();
@@ -677,10 +686,10 @@ public class FrontendCompiler extends DefaultVisitor<IRCode, Pair<List<Variable>
 			Variable var = new Variable(
 					new IntType(this.constructConstant(exp.targetBits), v.lab), 
 					v.lab, 
-					newTempVar());
+					v.cnt, newTempVar());
 			return new Pair<List<Variable>, IRCode>(one(var),
 					Seq.seq(pair.right,
-							new Assign(var.lab, var, new EnforceBitExp(v, var.getBits()))
+							new Assign(var.lab, v.cnt, var, new EnforceBitExp(v, var.getBits()))
 							));
 		}
 	}
@@ -691,11 +700,11 @@ public class FrontendCompiler extends DefaultVisitor<IRCode, Pair<List<Variable>
 		Pair<List<Variable>, IRCode> right = visit(andPredicate.right);
 		Variable lv = left.left.get(0);
 		Variable rv = right.left.get(0);
-		Variable var = new Variable(lv.type, lv.lab.meet(rv.lab), newTempVar());
+		Variable var = new Variable(lv.type, lv.lab.meet(rv.lab), lv.cnt.join(rv.cnt), newTempVar());
 
 		return new Pair<List<Variable>, IRCode>(one(var),
 				Seq.seq(Seq.seq(left.right, right.right),
-						new Assign(var.lab, var, new BopExp(lv, BopExp.Op.And, rv))
+						new Assign(var.lab, var.cnt, var, new BopExp(lv, BopExp.Op.And, rv))
 						));
 	}
 
@@ -705,10 +714,10 @@ public class FrontendCompiler extends DefaultVisitor<IRCode, Pair<List<Variable>
 		Pair<List<Variable>, IRCode> idx = visit(exp.indexExpr);
 		Variable av = array.left.get(0);
 		Variable iv = idx.left.get(0);
-		Variable var = new Variable(((ArrayType)av.type).type, ((ArrayType)av.type).indexLab.lab.meet(((ArrayType)av.type).getLabel()), newTempVar());
+		Variable var = new Variable(((ArrayType)av.type).type, ((ArrayType)av.type).indexLab.lab.meet(((ArrayType)av.type).getLabel()), (av.cnt).join((av).cnt), newTempVar());
 		return new Pair<List<Variable>, IRCode>(one(var),
 				Seq.seq(Seq.seq(array.right, idx.right),
-						new Assign(var.lab, var, new ArrayExp(av, iv))
+						new Assign(var.lab, var.cnt, var, new ArrayExp(av, iv))
 						));
 	}
 
@@ -718,17 +727,17 @@ public class FrontendCompiler extends DefaultVisitor<IRCode, Pair<List<Variable>
 		Variable lv = left.left.get(0);
 		if(exp.op == BOP.SHL) {
 			Pair<List<Variable>, IRCode> right = visit(exp.right);
-			Variable var = new Variable(lv.type, lv.lab, newTempVar());
+			Variable var = new Variable(lv.type, lv.lab, lv.cnt, newTempVar());
 			return new Pair<List<Variable>, IRCode>(one(var), 
 					Seq.seq(Seq.seq(left.right, right.right),
-							new Assign(var.lab, var, new BopExp(lv, BopExp.Op.Shl, right.left.get(0)))
+							new Assign(var.lab, var.cnt, var, new BopExp(lv, BopExp.Op.Shl, right.left.get(0)))
 							));
 		} else if(exp.op == BOP.SHR) {
 			Pair<List<Variable>, IRCode> right = visit(exp.right);
-			Variable var = new Variable(lv.type, lv.lab, newTempVar());
+			Variable var = new Variable(lv.type, lv.lab, lv.cnt, newTempVar());
 			return new Pair<List<Variable>, IRCode>(one(var), 
 					Seq.seq(Seq.seq(left.right, right.right),
-							new Assign(var.lab, var, new BopExp(lv, BopExp.Op.Shr, right.left.get(0)))
+							new Assign(var.lab, var.cnt, var, new BopExp(lv, BopExp.Op.Shr, right.left.get(0)))
 							));
 		}
 
@@ -736,30 +745,30 @@ public class FrontendCompiler extends DefaultVisitor<IRCode, Pair<List<Variable>
 		Variable rv = right.left.get(0), var;;
 		if(lv.type instanceof IntType) {
 			IntType it = (IntType)lv.type;
-			var = new Variable(new IntType(it.bit, lv.lab.meet(rv.lab)), lv.lab.meet(rv.lab), newTempVar());
+			var = new Variable(new IntType(it.bit, lv.lab.meet(rv.lab)), lv.lab.meet(rv.lab), lv.cnt.join(rv.cnt), newTempVar());
 		} else if(lv.type instanceof FloatType) {
 			FloatType ft = (FloatType)lv.type;
-			var = new Variable(new FloatType(ft.bit, lv.lab.meet(rv.lab)), lv.lab.meet(rv.lab), newTempVar());
+			var = new Variable(new FloatType(ft.bit, lv.lab.meet(rv.lab)), lv.lab.meet(rv.lab), lv.cnt.join(rv.cnt), newTempVar());
 		} else
 			throw new RuntimeException("Binary expression can be operated between only int values or float values.");
 
 		IRCode assign;
 		if(exp.op == BOP.ADD) {
-			assign = new Assign(var.lab, var, new BopExp(lv, BopExp.Op.Add, rv));
+			assign = new Assign(var.lab, var.cnt, var, new BopExp(lv, BopExp.Op.Add, rv));
 		} else if(exp.op == BOP.SUB) {
-			assign = new Assign(var.lab, var, new BopExp(lv, BopExp.Op.Sub, rv));
+			assign = new Assign(var.lab,var.cnt, var, new BopExp(lv, BopExp.Op.Sub, rv));
 		} else if(exp.op == BOP.MUL) {
-			assign = new Assign(var.lab, var, new BopExp(lv, BopExp.Op.Mul, rv));
+			assign = new Assign(var.lab,var.cnt, var, new BopExp(lv, BopExp.Op.Mul, rv));
 		} else if(exp.op == BOP.DIV) {
-			assign = new Assign(var.lab, var, new BopExp(lv, BopExp.Op.Div, rv));
+			assign = new Assign(var.lab,var.cnt, var, new BopExp(lv, BopExp.Op.Div, rv));
 		} else if(exp.op == BOP.MOD) {
-			assign = new Assign(var.lab, var, new BopExp(lv, BopExp.Op.Mod, rv));
+			assign = new Assign(var.lab, var.cnt,var, new BopExp(lv, BopExp.Op.Mod, rv));
 		} else if(exp.op == BOP.AND) {
-			assign = new Assign(var.lab, var, new BopExp(lv, BopExp.Op.And, rv));
+			assign = new Assign(var.lab,var.cnt, var, new BopExp(lv, BopExp.Op.And, rv));
 		} else if(exp.op == BOP.OR) {
-			assign = new Assign(var.lab, var, new BopExp(lv, BopExp.Op.Or, rv));
+			assign = new Assign(var.lab,var.cnt, var, new BopExp(lv, BopExp.Op.Or, rv));
 		} else if(exp.op == BOP.XOR) {
-			assign = new Assign(var.lab, var, new BopExp(lv, BopExp.Op.Xor, rv));
+			assign = new Assign(var.lab,var.cnt, var, new BopExp(lv, BopExp.Op.Xor, rv));
 		} else
 			throw new RuntimeException("Unsupported binary operation! "+exp.toString());
 
@@ -775,6 +784,7 @@ public class FrontendCompiler extends DefaultVisitor<IRCode, Pair<List<Variable>
 		Pair<List<Variable>, IRCode> right = visit(exp.right);
 		Variable rv = right.left.get(0);
 		Label lab = lv.lab.meet(rv.lab);
+		Count cnt = lv.cnt.join(rv.cnt);
 
 		if(lv.type instanceof IntType) {
 			IntType lty = (IntType)lv.type;
@@ -783,7 +793,7 @@ public class FrontendCompiler extends DefaultVisitor<IRCode, Pair<List<Variable>
 			if(lty.bit == null) lty.bit = rty.bit;
 			if(rty.bit == null) rty.bit = lty.bit;
 
-			Variable var = new Variable(new IntType(1, lab), lab, newTempVar());
+			Variable var = new Variable(new IntType(1, lab), lab, cnt, newTempVar());
 
 			IRCode assign;
 			if(exp.op == REL_OP.EQ) {
@@ -792,32 +802,32 @@ public class FrontendCompiler extends DefaultVisitor<IRCode, Pair<List<Variable>
 					ASTConstantExpression ce = (ASTConstantExpression)exp.right;
 					int cn = ce.value;
 					if(cn != 0) {
-						assign = new Assign(var.lab, var, new VarExp(lv));
+						assign = new Assign(var.lab, var.cnt, var, new VarExp(lv));
 					} else {
-						assign = new Assign(var.lab, var, new UnaryOpExp(UnaryOpExp.Op.Neg, lv));
+						assign = new Assign(var.lab, var.cnt, var, new UnaryOpExp(UnaryOpExp.Op.Neg, lv));
 					}
 				} else
-					assign = new Assign(var.lab, var, new RopExp(lv, RopExp.Op.Eq, rv));
+					assign = new Assign(var.lab, var.cnt, var, new RopExp(lv, RopExp.Op.Eq, rv));
 			} else if(exp.op == REL_OP.NEQ) {
 				if(lv.getBits().isConstant(1) && exp.right instanceof ASTConstantExpression) {
 					right.right = new Skip();
 					ASTConstantExpression ce = (ASTConstantExpression)exp.right;
 					int cn = ce.value;
 					if(cn == 0) {
-						assign = new Assign(var.lab, var, new VarExp(lv));
+						assign = new Assign(var.lab, var.cnt, var, new VarExp(lv));
 					} else {
-						assign = new Assign(var.lab, var, new UnaryOpExp(UnaryOpExp.Op.Neg, lv));
+						assign = new Assign(var.lab,var.cnt, var, new UnaryOpExp(UnaryOpExp.Op.Neg, lv));
 					}
 				} else
-					assign = new Assign(var.lab, var, new RopExp(lv, RopExp.Op.Ne, rv));
+					assign = new Assign(var.lab, var.cnt, var, new RopExp(lv, RopExp.Op.Ne, rv));
 			} else if(exp.op == REL_OP.GT) {
-				assign = new Assign(var.lab, var, new RopExp(lv, RopExp.Op.Gt, rv));
+				assign = new Assign(var.lab, var.cnt, var, new RopExp(lv, RopExp.Op.Gt, rv));
 			} else if(exp.op == REL_OP.GET) {
-				assign = new Assign(var.lab, var, new RopExp(lv, RopExp.Op.Ge, rv));
+				assign = new Assign(var.lab, var.cnt, var, new RopExp(lv, RopExp.Op.Ge, rv));
 			} else if(exp.op == REL_OP.LT) {
-				assign = new Assign(var.lab, var, new RopExp(lv, RopExp.Op.Lt, rv));
+				assign = new Assign(var.lab, var.cnt, var, new RopExp(lv, RopExp.Op.Lt, rv));
 			} else if(exp.op == REL_OP.LET) {
-				assign = new Assign(var.lab, var, new RopExp(lv, RopExp.Op.Le, rv));
+				assign = new Assign(var.lab, var.cnt, var, new RopExp(lv, RopExp.Op.Le, rv));
 			} else
 				throw new RuntimeException("Unsupported binary comparison! "+exp.toString());
 
@@ -825,27 +835,27 @@ public class FrontendCompiler extends DefaultVisitor<IRCode, Pair<List<Variable>
 					Seq.seq(Seq.seq(left.right, right.right), assign));
 		} else {
 			// assert it is nullable
-			Variable var = new Variable(new IntType(1, lab), lab, newTempVar());
+			Variable var = new Variable(new IntType(1, lab), lab,  cnt, newTempVar());
 
 			IRCode assign;
 			if(exp.op == REL_OP.EQ) {
 				if(rv.type instanceof NullType) {
 					if(lv.type instanceof NullType) {
-						assign = new Assign(var.lab, var, new ConstExp(1, new Constant(1)));
+						assign = new Assign(var.lab, var.cnt, var, new ConstExp(1, new Constant(1)));
 					} else {
-						assign = new Assign(var.lab, var, new CheckNullExp(true, lv));
+						assign = new Assign(var.lab, var.cnt, var, new CheckNullExp(true, lv));
 					}
 				} else 
-					assign = new Assign(var.lab, var, new RopExp(lv, RopExp.Op.Eq, rv));
+					assign = new Assign(var.lab, var.cnt, var, new RopExp(lv, RopExp.Op.Eq, rv));
 			} else if(exp.op == REL_OP.NEQ) {
 				if(rv.type instanceof NullType) {
 					if(lv.type instanceof NullType) {
-						assign = new Assign(var.lab, var, new ConstExp(1, new Constant(0)));
+						assign = new Assign(var.lab, var.cnt, var, new ConstExp(1, new Constant(0)));
 					} else {
-						assign = new Assign(var.lab, var, new CheckNullExp(false, lv));
+						assign = new Assign(var.lab, var.cnt, var, new CheckNullExp(false, lv));
 					}
 				} else 
-					assign = new Assign(var.lab, var, new RopExp(lv, RopExp.Op.Ne, rv));
+					assign = new Assign(var.lab, var.cnt, var, new RopExp(lv, RopExp.Op.Ne, rv));
 			} else
 				throw new RuntimeException("Unsupported binary comparison! "+exp.toString());
 
@@ -860,9 +870,9 @@ public class FrontendCompiler extends DefaultVisitor<IRCode, Pair<List<Variable>
 		if(bits == null) {
 			bits = new Constant(32);
 		}
-		Variable var = new Variable(new IntType(bits, Label.Pub), Label.Pub, newTempVar());
+		Variable var = new Variable(new IntType(bits, Label.Pub), Label.Pub, Count.Zero, newTempVar());
 		return new Pair<List<Variable>, IRCode>(one(var),
-				new Assign(Label.Pub, var, new ConstExp(exp.value, bits)));
+				new Assign(Label.Pub, Count.Zero, var, new ConstExp(exp.value, bits)));
 	}
 
 	@Override
@@ -891,9 +901,9 @@ public class FrontendCompiler extends DefaultVisitor<IRCode, Pair<List<Variable>
 					input.add(v);
 				} else {
 					VariableConstant bits = constructConstant(((ASTIntType)funcExpression.inputTypes.get(j)).getBits());
-					Variable nv = new Variable(new IntType(bits, Label.Secure), Label.Secure, newTempVar());
+					Variable nv = new Variable(new IntType(bits, Label.Secure), Label.Secure, Count.Zero, newTempVar());
 					code = Seq.seq(code,
-							new Assign(nv.lab, nv, new EnforceBitExp(v, bits))
+							new Assign(nv.lab,nv.cnt, nv, new EnforceBitExp(v, bits))
 							);
 					input.add(nv);
 				}
@@ -914,9 +924,9 @@ public class FrontendCompiler extends DefaultVisitor<IRCode, Pair<List<Variable>
 
 					Type ty = visit(fty.returnType);
 					Expression exp =  new LocalFuncCallExp(ty, name, input);
-					Variable var = new Variable(ty, ty.getLabel(), newTempVar());
+					Variable var = new Variable(ty, ty.getLabel(), Count.Zero, newTempVar());
 					return new Pair<List<Variable>, IRCode>(one(var),
-							Seq.seq(code, new Assign(var.lab, var, exp)));
+							Seq.seq(code, new Assign(var.lab, var.cnt, var, exp)));
 				}
 			}
 			for(ASTFunction func : program.functionDef) {
@@ -924,8 +934,8 @@ public class FrontendCompiler extends DefaultVisitor<IRCode, Pair<List<Variable>
 					Type ty = visit(func.returnType);
 					if(func.isDummy) {
 						if(this.currentCond == null) {
-							Variable var = new Variable(new IntType(1, Label.Secure), Label.Secure, newTempVar());
-							code = Seq.seq(code, new Assign(var.lab, var, new ConstExp(1, new Constant(1))));
+							Variable var = new Variable(new IntType(1, Label.Secure), Label.Secure, Count.Zero, newTempVar());
+							code = Seq.seq(code, new Assign(var.lab, var.cnt, var, new ConstExp(1, new Constant(1))));
 							input.add(var);
 						} else {
 							input.add(currentCond);
@@ -958,9 +968,9 @@ public class FrontendCompiler extends DefaultVisitor<IRCode, Pair<List<Variable>
 								input, 
 								false);
 					}
-					Variable var = new Variable(ty, ty.getLabel(), newTempVar());
+					Variable var = new Variable(ty, ty.getLabel(), Count.Zero, newTempVar());
 					return new Pair<List<Variable>, IRCode>(one(var),
-							Seq.seq(code, new Assign(var.lab, var, exp)));
+							Seq.seq(code, new Assign(var.lab,var.cnt, var, exp)));
 				}
 			}
 			throw new RuntimeException("Shouldn't reach here!");
@@ -978,8 +988,8 @@ public class FrontendCompiler extends DefaultVisitor<IRCode, Pair<List<Variable>
 					Type ty = visit(funcExpression.type);
 					if(func.isDummy) {
 						if(this.currentCond == null) {
-							Variable var = new Variable(new IntType(1, Label.Secure), Label.Secure, newTempVar());
-							code = Seq.seq(code, new Assign(var.lab, var,
+							Variable var = new Variable(new IntType(1, Label.Secure), Label.Secure, Count.Zero, newTempVar());
+							code = Seq.seq(code, new Assign(var.lab,var.cnt, var,
 									function.isDummy ? new VarExp(getPhantomVariable())
 											 : new ConstExp(1, new Constant(1))));
 							input.add(var);
@@ -1018,10 +1028,10 @@ public class FrontendCompiler extends DefaultVisitor<IRCode, Pair<List<Variable>
 								input, 
 								false);
 					}
-					Variable var = new Variable(ty, ty.getLabel(), newTempVar());
+					Variable var = new Variable(ty, ty.getLabel(), Count.Zero, newTempVar());
 					return new Pair<List<Variable>, IRCode>(one(var),
 							Seq.seq(Seq.seq(code, base.right),
-									new Assign(var.lab, var, exp)));
+									new Assign(var.lab, var.cnt, var, exp)));
 				}
 			}
 			throw new RuntimeException("Shouldn't reach here!");
@@ -1041,9 +1051,9 @@ public class FrontendCompiler extends DefaultVisitor<IRCode, Pair<List<Variable>
 			code = Seq.seq(code, tmp.right);
 		}
 		NewObjExp nexp = new NewObjExp(type, type.lab, init);
-		Variable var = new Variable(type, type.getLabel(), newTempVar());
+		Variable var = new Variable(type, type.getLabel(), Count.Zero, newTempVar());
 		return new Pair<List<Variable>, IRCode>(one(var),
-				Seq.seq(code, new Assign(var.lab, var, nexp)));
+				Seq.seq(code, new Assign(var.lab, var.cnt, var, nexp)));
 	}
 
 	@Override
@@ -1052,11 +1062,11 @@ public class FrontendCompiler extends DefaultVisitor<IRCode, Pair<List<Variable>
 		Pair<List<Variable>, IRCode> right = visit(orPredicate.right);
 		Variable lv = left.left.get(0);
 		Variable rv = right.left.get(0);
-		Variable var = new Variable(lv.type, lv.lab.meet(rv.lab), newTempVar());
+		Variable var = new Variable(lv.type, lv.lab.meet(rv.lab), lv.cnt.join(rv.cnt), newTempVar());
 
 		return new Pair<List<Variable>, IRCode>(one(var),
 				Seq.seq(Seq.seq(left.right, right.right),
-						new Assign(var.lab, var, new BopExp(lv, BopExp.Op.Or, rv))
+						new Assign(var.lab, var.cnt, var, new BopExp(lv, BopExp.Op.Or, rv))
 						));
 	}
 
@@ -1067,10 +1077,10 @@ public class FrontendCompiler extends DefaultVisitor<IRCode, Pair<List<Variable>
 		RecExp exp = new RecExp(ty.lab, code.left.get(0), rec.field);
 		Variable var = new Variable(ty.fields.get(rec.field), 
 				ty.fields.get(rec.field).getLabel(), 
-				newTempVar());
+				Count.Zero, newTempVar());
 
 		return new Pair<List<Variable>, IRCode>(one(var),
-				Seq.seq(code.right, new Assign(var.lab, var, exp)));
+				Seq.seq(code.right, new Assign(var.lab,  var.cnt, var, exp)));
 	}
 
 	@Override
@@ -1081,7 +1091,7 @@ public class FrontendCompiler extends DefaultVisitor<IRCode, Pair<List<Variable>
 		String[] fields = new String[((RecordType)bv.type).fields.size()];
 		int j = 0;
 		for(Map.Entry<String, Type> i : ((RecordType)bv.type).fields.entrySet()) {
-			var[j] = new Variable(i.getValue(), i.getValue().getLabel(), newTempVar());
+			var[j] = new Variable(i.getValue(), i.getValue().getLabel(), Count.Zero, newTempVar());
 			fields[j] = i.getKey();
 			j++;
 		}
@@ -1146,18 +1156,18 @@ public class FrontendCompiler extends DefaultVisitor<IRCode, Pair<List<Variable>
 	public Pair<List<Variable>, IRCode> visit(
 			ASTFloatConstantExpression exp) {
 		VariableConstant bits = this.constructConstant(exp.bitSize);
-		Variable var = new Variable(new FloatType(bits, Label.Pub), Label.Pub, newTempVar());
+		Variable var = new Variable(new FloatType(bits, Label.Pub), Label.Pub, Count.Zero, newTempVar());
 		return new Pair<List<Variable>, IRCode>(one(var),
-				new Assign(Label.Pub, var, new ConstExp(exp.value, bits)));
+				new Assign(Label.Pub, Count.Zero, var, new ConstExp(exp.value, bits)));
 	}
 
 	@Override
 	public Pair<List<Variable>, IRCode> visit(ASTLogExpression tuple) {
 		Pair<List<Variable>, IRCode> expCode = visit(tuple.exp);
-		Variable var = new Variable(new IntType(32, Label.Pub), Label.Pub, newTempVar());
+		Variable var = new Variable(new IntType(32, Label.Pub), Label.Pub, Count.Zero, newTempVar());
 		return new Pair<List<Variable>, IRCode>(one(var),
 				Seq.seq(expCode.right,
-						new Assign(Label.Pub, var, new LogExp(Label.Pub, expCode.left.get(0)))));
+						new Assign(Label.Pub, Count.Zero, var, new LogExp(Label.Pub, expCode.left.get(0)))));
 	}
 
 	@Override
@@ -1166,41 +1176,42 @@ public class FrontendCompiler extends DefaultVisitor<IRCode, Pair<List<Variable>
 		VariableConstant ll = this.constructConstant(tuple.rangel);
 		IRCode code = expCode.right;
 		Label lab = expCode.left.get(0).lab;
+		Count cnt = expCode.left.get(0).cnt;
 		if(tuple.ranger == null) {
 			Variable var = new Variable(
 					new IntType(1, lab), 
 					lab, 
-					newTempVar());
+					cnt, newTempVar());
 			return new Pair<List<Variable>, IRCode>(one(var),
 					Seq.seq(code,
-							new Assign(lab, var, 
+							new Assign(lab, cnt, var, 
 									new RangeExp(lab, expCode.left.get(0), ll, null)))); 
 		} else {
 			VariableConstant rr = this.constructConstant(tuple.ranger);
 			Variable var = new Variable(
 					new IntType(new BOPVariableConstant(rr, Op.Sub, ll), lab), 
 					lab, 
-					newTempVar());
+					cnt, newTempVar());
 			return new Pair<List<Variable>, IRCode>(one(var),
 					Seq.seq(code,
-							new Assign(lab, var, 
+							new Assign(lab, cnt, var, 
 									new RangeExp(lab, expCode.left.get(0), ll, rr)))); 
 		}
 	}
 
 	public Pair<List<Variable>, IRCode> visit(ASTBoxNullableExpression exp) {
 		Pair<List<Variable>, IRCode> tmp = visit(exp.exp);
-		Variable var = new Variable(new DummyType(tmp.left.get(0).type), tmp.left.get(0).lab, newTempVar());
+		Variable var = new Variable(new DummyType(tmp.left.get(0).type), tmp.left.get(0).lab, tmp.left.get(0).cnt, newTempVar());
 		IRCode code = Seq.seq(tmp.right, 
-				new Assign(var.lab, var, new BoxNullExp(tmp.left.get(0))));
+				new Assign(var.lab,var.cnt, var, new BoxNullExp(tmp.left.get(0))));
 		return new Pair<List<Variable>, IRCode>(one(var), code);
 	}
 
 	public Pair<List<Variable>, IRCode> visit(ASTGetValueExpression exp) {
 		Pair<List<Variable>, IRCode> tmp = visit(exp.exp);
-		Variable var = new Variable(((DummyType)tmp.left.get(0).type).type, tmp.left.get(0).lab, newTempVar());
+		Variable var = new Variable(((DummyType)tmp.left.get(0).type).type, tmp.left.get(0).lab, tmp.left.get(0).cnt, newTempVar());
 		IRCode code = Seq.seq(tmp.right, 
-				new Assign(var.lab, var, new GetValueExp(exp.way, tmp.left.get(0))));
+				new Assign(var.lab, var.cnt, var, new GetValueExp(exp.way, tmp.left.get(0))));
 		return new Pair<List<Variable>, IRCode>(one(var), code);
 	}
 
@@ -1217,8 +1228,8 @@ public class FrontendCompiler extends DefaultVisitor<IRCode, Pair<List<Variable>
 
 	@Override
 	public Pair<List<Variable>, IRCode> visit(ASTNullExpression exp) {
-		Variable var = new Variable(NullType.inst, Label.Pub, newTempVar());
-		IRCode code = new Assign(Label.Pub, var, NullExp.inst);
+		Variable var = new Variable(NullType.inst, Label.Pub, Count.Zero, newTempVar());
+		IRCode code = new Assign(Label.Pub, Count.Zero, var, NullExp.inst);
 		return new Pair<List<Variable>, IRCode>(one(var), code);
 	}
 
@@ -1241,10 +1252,10 @@ public class FrontendCompiler extends DefaultVisitor<IRCode, Pair<List<Variable>
 		for(Pair<String, ASTExpression> ent : stmt.use) {
 			Pair<List<Variable>, IRCode> res = visit(ent.right);
 			Type ty = visit(ent.right.type);
-			Variable var = new Variable(ty, ty.getLabel(), ent.left, true);
-			this.variableValues.put(ent.left, new Variable(ty, ty.getLabel(), ent.left, false));
+			Variable var = new Variable(ty, ty.getLabel(), Count.Zero, ent.left, true);
+			this.variableValues.put(ent.left, new Variable(ty, ty.getLabel(), Count.Zero, ent.left, false));
 			code = Seq.seq(code, res.right);
-			code = Seq.seq(code, new Assign(var.lab, var, new VarExp(res.left.get(0))));
+			code = Seq.seq(code, new Assign(var.lab,var.cnt, var, new VarExp(res.left.get(0))));
 		}
 		for(ASTStatement st : stmt.body) {
 			code = Seq.seq(code, visit(st));
@@ -1260,8 +1271,8 @@ public class FrontendCompiler extends DefaultVisitor<IRCode, Pair<List<Variable>
 	@Override
 	public Pair<List<Variable>, IRCode> visit(ASTSizeExpression exp) {
 		Type type = visit(exp.type);
-		Variable var = new Variable(new IntType(32, Label.Pub), Label.Pub, newTempVar());
-		IRCode code = new Assign(Label.Pub, var, new SizeofExp(type));
+		Variable var = new Variable(new IntType(32, Label.Pub), Label.Pub, Count.Zero, newTempVar());
+		IRCode code = new Assign(Label.Pub, Count.Zero, var, new SizeofExp(type));
 		return new Pair<List<Variable>, IRCode>(one(var), code);
 	}
 

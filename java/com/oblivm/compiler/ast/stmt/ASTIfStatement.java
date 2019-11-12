@@ -30,13 +30,14 @@ public class ASTIfStatement extends ASTStatement {
 	
 		for(int i=0; i<trueBranch.size(); ++i) {
 			tcnt.join(trueBranch.get(i).getCount());
+			System.out.println("If Statement True Count is" + tcnt );
 		}
 		if(falseBranch.size() == 0) {
 			fcnt=ASTCount.Zero;
 		} else {
 			for(int i=0; i<falseBranch.size(); ++i) {
 				fcnt.join(falseBranch.get(i).getCount());
-			System.out.println("If Statement Count is" + falseBranch.get(i).getCount() );
+			System.out.println("If False Statement Count is" + fcnt);
 	}
 		}
 	}

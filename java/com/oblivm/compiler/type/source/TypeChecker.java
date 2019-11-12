@@ -300,11 +300,22 @@ public class TypeChecker extends DefaultStatementExpressionVisitor<Boolean, List
 	public Boolean visit(ASTIfStatement ifStatement) {
 		ASTLabel old = secureContext;
 		ASTCount cnt=ifStatement.tcnt;
-		if(cnt.equal(ifStatement.fcnt)) {
-			System.out.println("Counts equal");
+
+		for(int i=0; i<ifStatement.trueBranch.size(); ++i) {
+			ifStatement.tcnt.join(ifStatement.trueBranch.get(i).getCount());
+			//System.out.println("If Statement True Count is" + tcnt );
+		}
+		for(int i=0; i<ifStatement.falseBranch.size(); ++i) {
+			ifStatement.fcnt.join(ifStatement.falseBranch.get(i).getCount());
+			//System.out.println("If Statement True Count is" + tcnt );
+		}
+		
+		if((ifStatement.tcnt).equal(ifStatement.fcnt)) {
+			System.out.println("Counts equal"+ifStatement.tcnt);
 		}
 		else
 		{
+			System.out.println("Counts not equal"+ifStatement.fcnt);
 			return false;
 		}
 		ASTType ty = assertOne(visit(ifStatement.cond));
