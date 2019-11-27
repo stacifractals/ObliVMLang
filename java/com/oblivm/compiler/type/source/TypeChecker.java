@@ -87,7 +87,7 @@ public class TypeChecker extends DefaultStatementExpressionVisitor<Boolean, List
 
 		if(!bc.check(program)) {
 			Bugs.LOG.log("Miss usage of bit variables!");
-			System.exit(1);
+			////////System.exit(1);
 		}
 		
 		bi.check(program);
@@ -164,7 +164,7 @@ public class TypeChecker extends DefaultStatementExpressionVisitor<Boolean, List
 					}
 					sb.append("} are consumed");
 					Bugs.LOG.log(sb.toString());
-					System.exit(1);
+					////////System.exit(1);
 				}
 				variableMapping = old;
 			}
@@ -336,20 +336,20 @@ public class TypeChecker extends DefaultStatementExpressionVisitor<Boolean, List
 		ASTCount tempT=ASTCount.Zero;
 		for(int i=0; i<ifStatement.trueBranch.size(); ++i) {
 			tempT=tempT.join(ifStatement.trueBranch.get(i).getCount());
-			System.out.println("If Statement True Count is" + ifStatement.tcnt );
+		//	////////System.out.println("If Statement True Count is" + ifStatement.tcnt );
 		}
 		for(int i=0; i<ifStatement.falseBranch.size(); ++i) {
 			tempF=tempF.join(ifStatement.falseBranch.get(i).getCount());
 			ifStatement.fcnt.join(ifStatement.falseBranch.get(i).getCount());
-			System.out.println("If Statement FalseCount is" + ifStatement.fcnt );
+		//	////////System.out.println("If Statement FalseCount is" + ifStatement.fcnt );
 		}
 		
 		if((tempT).equal(tempF)) {
-			System.out.println("Counts equal"+ifStatement.tcnt+"Falsecnt"+ifStatement.fcnt);
+		//	////////System.out.println("Counts equal"+ifStatement.tcnt+"Falsecnt"+ifStatement.fcnt);
 		}
 		else
 		{
-			System.out.println("Counts not equal"+ifStatement.fcnt+"f and t cnt"+ifStatement.tcnt);
+		//	////////System.out.println("Counts not equal"+ifStatement.fcnt+"f and t cnt"+ifStatement.tcnt);
 			return false;
 		}
 		return true;
@@ -387,7 +387,7 @@ public class TypeChecker extends DefaultStatementExpressionVisitor<Boolean, List
 		}
 		for(ASTStatement stmt : whileStatement.body)
 			if(!visit(stmt)) {
-//				System.err.println(stmt+" cannot type check!");
+//				////////System.err.println(stmt+" cannot type check!");
 //				visit(stmt);
 				Bugs.LOG.log(stmt.beginPosition, "statement cannot type check!");
 				return false;
@@ -433,7 +433,7 @@ public class TypeChecker extends DefaultStatementExpressionVisitor<Boolean, List
 		ResourceBudget afterBudget = budget.clone();
 		for(ASTStatement stmt : whileStatement.body)
 			if(!visit(stmt)) {
-//				System.err.println(stmt+" cannot type check!");
+//				////////System.err.println(stmt+" cannot type check!");
 //				visit(stmt);
 				Bugs.LOG.log(stmt.beginPosition, "statement cannot type check!");
 				secureContext = old;
@@ -1068,7 +1068,7 @@ public class TypeChecker extends DefaultStatementExpressionVisitor<Boolean, List
 			Pair<String, ASTExpression> pair = stmt.condList.get(i);
 			ASTType type = assertOne(visit(pair.right));
 			if(!(type.canFlowTo(ASTNullType.get()))) {
-				System.err.println("ONREAL or ONDUMMY should noly be checked on dummy types!");
+				////////System.err.println("ONREAL or ONDUMMY should noly be checked on dummy types!");
 				return false;
 			}
 			if(pair.left != null)
@@ -1076,7 +1076,7 @@ public class TypeChecker extends DefaultStatementExpressionVisitor<Boolean, List
 		}
 		for(int i=0; i<stmt.body.size(); ++i) {
 			if(!visit(stmt.body.get(i))) {
-				System.err.println("Statement "+stmt.body.get(i)+" can't type check.");
+				////////System.err.println("Statement "+stmt.body.get(i)+" can't type check.");
 				return false;
 			}
 		}

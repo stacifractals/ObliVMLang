@@ -143,7 +143,7 @@ public class FrontendCompiler extends DefaultVisitor<IRCode, Pair<List<Variable>
 	}
 
 	public IRCode visit(ASTStatement statement) {
-		System.out.println("Statement Visitor");
+		//System.out.println("Statement Visitor");
 		if(statement instanceof ASTBranchStatement) {
 			return visit((ASTBranchStatement)statement);
 		} else {
@@ -164,7 +164,7 @@ public class FrontendCompiler extends DefaultVisitor<IRCode, Pair<List<Variable>
 	public TypeManager compile(ASTProgram program) {
 		if(!tc.check(program)) {
 			Bugs.LOG.log("The program does not type check.");
-			System.exit(1);
+			//System.exit(1);
 		}
 		Info.LOG.log("The program type checks");
 		//s("In Compiler FrontEnd \n");
@@ -313,21 +313,21 @@ public class FrontendCompiler extends DefaultVisitor<IRCode, Pair<List<Variable>
 
 	@Override
 	public Type visit(ASTArrayType type) {
-		System.out.println("ArrayType");
+		//System.out.println("ArrayType");
 
 		return new ArrayType(constructConstant(type.size), Label.get(type.lab), visit(type.type));
 	}
 
 	@Override
 	public Type visit(ASTIntType type) {
-		System.out.println("IntType");
+		//System.out.println("IntType");
 
 		return new IntType(constructConstant(type.getBits()), Label.get(type.getLabel()));
 	}
 
 	@Override
 	public Type visit(ASTNativeType type) {
-		System.out.println("NativeType");
+		//System.out.println("NativeType");
 
 		// TODO raw name
 		if(type.constructor == null) {
@@ -343,7 +343,7 @@ public class FrontendCompiler extends DefaultVisitor<IRCode, Pair<List<Variable>
 
 	@Override
 	public Type visit(ASTRecType type) {
-		System.out.println("RecType");
+		//System.out.println("RecType");
 
 		List<VariableConstant> vc = new ArrayList<VariableConstant>();
 		for(int i = 0; i < type.bitVariables.size(); ++i)
@@ -362,14 +362,14 @@ public class FrontendCompiler extends DefaultVisitor<IRCode, Pair<List<Variable>
 
 	@Override
 	public Type visit(ASTVariableType type) {
-		System.out.println("Variable Type");
+		//System.out.println("Variable Type");
 
 		return new VariableType(type.var);
 	}
 
 	@Override
 	public Type visit(ASTVoidType type) {
-		System.out.println("VoidType");
+		//System.out.println("VoidType");
 
 		return VoidType.get();
 	}
@@ -377,7 +377,7 @@ public class FrontendCompiler extends DefaultVisitor<IRCode, Pair<List<Variable>
 	private static Variable phantomVariable = null;
 
 	private static Variable getPhantomVariable() {
-		System.out.println("GetPhantomVariable");
+		//System.out.println("GetPhantomVariable");
 
 		if(phantomVariable == null) {
 		//	phantomVariable =
@@ -388,7 +388,7 @@ public class FrontendCompiler extends DefaultVisitor<IRCode, Pair<List<Variable>
 	}
 
 	public IRCode translateAssign(ASTArrayExpression exp, Variable value) {
-		System.out.println("Translate Assign1");
+		//System.out.println("Translate Assign1");
 
 		Pair<List<Variable>, IRCode> tmp = visit(exp.var);
 		IRCode code = tmp.right;
@@ -414,7 +414,7 @@ public class FrontendCompiler extends DefaultVisitor<IRCode, Pair<List<Variable>
 	}
 
 	public IRCode translateAssign(ASTRangeExpression exp, Variable value) {
-		System.out.println("Translate Assign2");
+		//System.out.println("Translate Assign2");
 		Pair<List<Variable>, IRCode> tmp = visit(exp.source);
 		IRCode code = tmp.right;
 		Variable v = tmp.left.get(0);
@@ -437,7 +437,7 @@ public class FrontendCompiler extends DefaultVisitor<IRCode, Pair<List<Variable>
 	}
 
 	private IRCode translateAssign(Variable base, String field, Variable value) {
-		System.out.println("Translate Assign3");
+		//System.out.println("Translate Assign3");
 		if(this.currentCond == null) {
 			return new RecordAssign(base.type.getLabel(), base, field, value);
 		} else {
@@ -454,14 +454,14 @@ public class FrontendCompiler extends DefaultVisitor<IRCode, Pair<List<Variable>
 	}
 
 	public IRCode translateAssign(ASTRecExpression exp, Variable value) {
-		System.out.println("Translate Assign4");
+		//System.out.println("Translate Assign4");
 		Pair<List<Variable>, IRCode> tmp = visit(exp.base);
 		IRCode code = tmp.right;
 		return Seq.seq(code, translateAssign(tmp.left.get(0), exp.field, value));
 	}
 
 	public IRCode translateAssign(ASTTupleExpression exp, List<Variable> values) {
-		System.out.println("Translate Assign5");
+		//System.out.println("Translate Assign5");
 		IRCode code = new Skip();
 		for(int i=0; i<exp.exps.size(); ++i) {
 			Variable value = values.get(i);
@@ -479,7 +479,7 @@ public class FrontendCompiler extends DefaultVisitor<IRCode, Pair<List<Variable>
 	}
 
 	public IRCode translateAssign(ASTRecTupleExpression exp, List<Variable> values) {
-		System.out.println("Translate Assign6");
+		//System.out.println("Translate Assign6");
 		Pair<List<Variable>, IRCode> tmp = visit(exp);
 		IRCode code = tmp.right;
 		Variable v = tmp.left.get(0);
@@ -491,7 +491,7 @@ public class FrontendCompiler extends DefaultVisitor<IRCode, Pair<List<Variable>
 	}
 
 	public IRCode translateAssign(ASTVariableExpression exp, Variable value) {
-		System.out.println("Translate Assign7");
+		//System.out.println("Translate Assign7");
 		Pair<List<Variable>, IRCode> tmp = visit(exp);
 		IRCode code = tmp.right;
 		Variable v = tmp.left.get(0);
@@ -513,7 +513,7 @@ public class FrontendCompiler extends DefaultVisitor<IRCode, Pair<List<Variable>
 	}
 
 	public IRCode visit(ASTBranchStatement stmt) {
-		System.out.println("Branch Stmt");
+		//System.out.println("Branch Stmt");
 		if(stmt.pred == null) {
 			Variable var = this.variableValues.get(stmt.stateVar+"_new");
 			Variable tmp = new Variable(var.type, var.lab, var.cnt, newTempVar());
@@ -566,19 +566,19 @@ public class FrontendCompiler extends DefaultVisitor<IRCode, Pair<List<Variable>
 
 	@Override
 	public IRCode visit(ASTAssignStatement stmt) {
-		System.out.println("Assign Stmt");
+		//System.out.println("Assign Stmt");
 		//Variable lv = left.left.get(0);
 
 	//	Pair<List<Variable>, IRCode> right = visit(exp.right);
 		//Variable rv = right.left.get(0);
-		//System.out.println("Statement Assign Visitor");
+		////System.out.println("Statement Assign Visitor");
 		Pair<List<Variable>, IRCode> res = visit(stmt.expr);
 		
 		IRCode code = res.right;
 		
 		stmt.var.cnt=(res.left.get(0).cnt).join(Count.One);
 	//	stmt.var.cnt = lv.cnt.join(rv.cnt);
-		System.out.println(stmt.var.cnt);
+		//System.out.println(stmt.var.cnt);
 		if(res.left.size() == 1) {
 			Variable value = res.left.get(0);
 		
@@ -604,7 +604,7 @@ public class FrontendCompiler extends DefaultVisitor<IRCode, Pair<List<Variable>
 
 	@Override
 	public IRCode visit(ASTFuncStatement funcStatement) {
-		System.out.println("FuncStmt");
+		//System.out.println("FuncStmt");
 		//TODO this is ugly, need to change later
 		Pair<List<Variable>, IRCode> value = visit(funcStatement.func);
 		IRCode ret = value.right;
@@ -621,24 +621,24 @@ public class FrontendCompiler extends DefaultVisitor<IRCode, Pair<List<Variable>
 	@Override
 	public IRCode visit(ASTIfStatement ifStatement) {
 		//, lv.lab.meet(rv.lab)
-		System.out.println("Statement If Visitor");
+		//System.out.println("Statement If Visitor");
 		Pair<List<Variable>, IRCode> value = visit(ifStatement.cond);
 		if(value.left.get(0).lab == Label.Secure || currentCond != null) {
-			System.out.println("First IF");
+			//System.out.println("First IF");
 			IRCode ret = value.right;
 			Variable old = this.currentCond;
 			//rm phantom
 		//if(currentCond == null)
 				//this.currentCond = getPhantomVariable();
 			if(currentCond == null) {
-				System.out.println("Null IF");
+				//System.out.println("Null IF");
 				this.currentCond = value.left.get(0);
 			} else {
-				System.out.println("Else Null IF");
+				//System.out.println("Else Null IF");
 				Variable var = new Variable(new IntType(1, Label.Secure), Label.Secure, Count.One, newTempVar());
 				ret = Seq.seq(ret, new Assign(Label.Secure, Count.One, var, new BopExp(this.currentCond, BopExp.Op.And, value.left.get(0))));
 				this.currentCond = var;
-				System.out.println("Count in true" + this.currentCond.cnt);
+				//System.out.println("Count in true" + this.currentCond.cnt);
 			}
 			IRCode tb = new Skip();
 			for(int i=0; i<ifStatement.trueBranch.size(); ++i)
@@ -648,7 +648,7 @@ public class FrontendCompiler extends DefaultVisitor<IRCode, Pair<List<Variable>
 			this.currentCond = old;
 
 			if(ifStatement.falseBranch.size() > 0) {
-				System.out.println("False IF");
+				//System.out.println("False IF");
 				//if(currentCond == null && this.phantom)
 				//	this.currentCond = getPhantomVariable();
 				Variable neg = new Variable(new IntType(1, Label.Secure), Label.Secure, Count.One, newTempVar());
@@ -668,31 +668,31 @@ public class FrontendCompiler extends DefaultVisitor<IRCode, Pair<List<Variable>
 			}
 			return ret;
 		} else {
-			System.out.println("Null FALSE IF");
+			//System.out.println("Null FALSE IF");
 			IRCode tb = new Skip();
-			ASTCount temp=ASTCount.Zero;
+		//	ASTCount temp=ASTCount.Zero;
 			for(int i=0; i<ifStatement.trueBranch.size(); ++i) {
 				tb = Seq.seq(tb, visit(ifStatement.trueBranch.get(i)));
 				//should have count for assign.
-		temp=temp.join(ifStatement.trueBranch.get(i).getCount());
+	//	temp=temp.join(ifStatement.trueBranch.get(i).getCount());
 				
-				//System.out.println("Count" + ifStatement.trueBranch.get(i).getCount());
+				////System.out.println("Count" + ifStatement.trueBranch.get(i).getCount());
 			//	if(i>0) {
 				//ifStatement.trueBranch.get(i).getCount().join(ifStatement.trueBranch.get(i-1).getCount());
 			//	}
-				System.out.println(i+"Count after join"+temp);
+				//System.out.println(i+"Count after join"+temp);
 				
 
 			}
-			ifStatement.tcnt=temp;
+			//ifStatement.tcnt=temp;
 			IRCode fb = new Skip();
-			ASTCount tempF=ASTCount.Zero;
+		//	ASTCount tempF=ASTCount.Zero;
 			for(int i=0; i<ifStatement.falseBranch.size(); ++i) {
 				fb = Seq.seq(fb, visit(ifStatement.falseBranch.get(i)));
-				System.out.println(i+"Count after join False" + ifStatement.falseBranch.get(i).getCount());
-				tempF=tempF.join(ifStatement.falseBranch.get(i).getCount());
+				//System.out.println(i+"Count after join False" + ifStatement.falseBranch.get(i).getCount());
+			//	tempF=tempF.join(ifStatement.falseBranch.get(i).getCount());
 			}
-			ifStatement.fcnt=tempF;
+		//	ifStatement.fcnt=tempF;
 			return Seq.seq(value.right, 
 					new If(value.left.get(0).lab, value.left.get(0), tb, fb));
 		}
@@ -700,14 +700,14 @@ public class FrontendCompiler extends DefaultVisitor<IRCode, Pair<List<Variable>
 
 	@Override
 	public IRCode visit(ASTReturnStatement returnStatement) {
-		System.out.println("REturn Statement");
+		//System.out.println("REturn Statement");
 		Pair<List<Variable>, IRCode> t = visit(returnStatement.exp);
 		return Seq.seq(t.right, new Ret(t.left.get(0)));
 	}
 
 	@Override
 	public IRCode visit(ASTWhileStatement whileStatement) {
-		System.out.println("While Stmt");
+		//System.out.println("While Stmt");
 		Pair<List<Variable>, IRCode> value = visit(whileStatement.cond);
 		if(value.left.get(0).lab == Label.Secure || currentCond != null) {
 			throw new RuntimeException("while loop cannot appear within a secure context.");
@@ -722,7 +722,7 @@ public class FrontendCompiler extends DefaultVisitor<IRCode, Pair<List<Variable>
 	}
 
 	public IRCode visit(ASTBoundedWhileStatement stmt) {
-		System.out.println("Bounded While");
+		//System.out.println("Bounded While");
 		throw new RuntimeException("Should have eliminated all bounded loop before this.");
 	}
 
