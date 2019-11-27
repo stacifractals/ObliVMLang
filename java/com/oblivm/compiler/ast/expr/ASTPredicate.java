@@ -3,8 +3,10 @@
  */
 package com.oblivm.compiler.ast.expr;
 
+import com.oblivm.compiler.type.manage.Count;
+
 public abstract class ASTPredicate extends ASTExpression {
-	public ASTCount cnt;
+	public Count cnt;
 	public String toString(int indent) {
 		return toString();
 	}

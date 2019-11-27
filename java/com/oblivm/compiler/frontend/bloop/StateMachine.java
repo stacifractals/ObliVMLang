@@ -17,6 +17,7 @@ import com.oblivm.compiler.ast.stmt.ASTAssignStatement;
 import com.oblivm.compiler.ast.stmt.ASTIfStatement;
 import com.oblivm.compiler.ast.stmt.ASTStatement;
 import com.oblivm.compiler.ast.stmt.ASTWhileStatement;
+import com.oblivm.compiler.type.manage.Count;
 
 public class StateMachine {
 	public List<State> states = new ArrayList<State>();
@@ -72,10 +73,10 @@ public class StateMachine {
 			State s = states.get(i);
 			if(s.getFinalStatement() instanceof ASTBranchStatement) {
 				ASTBranchStatement br = (ASTBranchStatement)s.getFinalStatement();
-				if(br.goTrue == Label.Next) br.goTrue = label;
+				if(br.goTrue == Label.Next) { br.goTrue = label;}
 				if(br.goFalse == Label.Next) br.goFalse = label;
 			} else if (i == states.size() - 1) {
-				s.stmts.add(new ASTBranchStatement(label));
+				s.stmts.add(new ASTBranchStatement(label,Count.One));
 			}
 		}
 	}

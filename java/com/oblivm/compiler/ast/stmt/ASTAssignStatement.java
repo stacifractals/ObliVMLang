@@ -15,7 +15,7 @@ import com.oblivm.compiler.ast.expr.ASTExpression;
 public class ASTAssignStatement extends ASTStatement {
 	public ASTExpression var;
 	public ASTExpression expr;
-	public ASTCount cnt;
+	public ASTCount cnt=ASTCount.One;
 	public ASTAssignStatement(ASTExpression v, ASTExpression e) {
 		this.var = v;
 		this.expr = e;

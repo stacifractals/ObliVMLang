@@ -189,6 +189,7 @@ public class TypeChecker extends DefaultStatementExpressionVisitor<Boolean, List
 
 	@Override
 	public Boolean visit(ASTAssignStatement assignStatement) {
+		assignStatement.cnt=ASTCount.One;
 		if(!ac.visit(assignStatement.var))
 			return false;
 		List<ASTType> expTypes = visit(assignStatement.expr);
@@ -299,25 +300,7 @@ public class TypeChecker extends DefaultStatementExpressionVisitor<Boolean, List
 	@Override
 	public Boolean visit(ASTIfStatement ifStatement) {
 		ASTLabel old = secureContext;
-		ASTCount cnt=ifStatement.tcnt;
-
-		for(int i=0; i<ifStatement.trueBranch.size(); ++i) {
-			ifStatement.tcnt.join(ifStatement.trueBranch.get(i).getCount());
-			//System.out.println("If Statement True Count is" + tcnt );
-		}
-		for(int i=0; i<ifStatement.falseBranch.size(); ++i) {
-			ifStatement.fcnt.join(ifStatement.falseBranch.get(i).getCount());
-			//System.out.println("If Statement True Count is" + tcnt );
-		}
 		
-		if((ifStatement.tcnt).equal(ifStatement.fcnt)) {
-			System.out.println("Counts equal"+ifStatement.tcnt);
-		}
-		else
-		{
-			System.out.println("Counts not equal"+ifStatement.fcnt);
-			return false;
-		}
 		ASTType ty = assertOne(visit(ifStatement.cond));
 		bcon.process(ty, ifStatement.cond);
 		//accessing once b/c conditional needs to be that
@@ -348,7 +331,30 @@ public class TypeChecker extends DefaultStatementExpressionVisitor<Boolean, List
 			}
 		secureContext = old;
 		setBudget(trueBudget.join(budget));
+		ASTCount cnt=ifStatement.tcnt;
+		ASTCount tempF=ASTCount.Zero;
+		ASTCount tempT=ASTCount.Zero;
+		for(int i=0; i<ifStatement.trueBranch.size(); ++i) {
+			tempT=tempT.join(ifStatement.trueBranch.get(i).getCount());
+			System.out.println("If Statement True Count is" + ifStatement.tcnt );
+		}
+		for(int i=0; i<ifStatement.falseBranch.size(); ++i) {
+			tempF=tempF.join(ifStatement.falseBranch.get(i).getCount());
+			ifStatement.fcnt.join(ifStatement.falseBranch.get(i).getCount());
+			System.out.println("If Statement FalseCount is" + ifStatement.fcnt );
+		}
+		
+		if((tempT).equal(tempF)) {
+			System.out.println("Counts equal"+ifStatement.tcnt+"Falsecnt"+ifStatement.fcnt);
+		}
+		else
+		{
+			System.out.println("Counts not equal"+ifStatement.fcnt+"f and t cnt"+ifStatement.tcnt);
+			return false;
+		}
 		return true;
+		
+		
 	}
 
 	@Override

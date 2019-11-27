@@ -5,6 +5,7 @@ package com.oblivm.compiler.ast.expr;
 
 import com.oblivm.compiler.ast.AST;
 import com.oblivm.compiler.ast.type.ASTType;
+import com.oblivm.compiler.type.manage.Count;
 
 /**
  * Top level class for expression.  
@@ -26,7 +27,7 @@ public abstract class ASTExpression extends AST {
 
 	
 	public ASTExpression targetBits = null;
-	public ASTCount cnt=null;
+	public Count cnt=Count.One;
 	public ASTType type = null;
 	
 	public String toString(int indent) {

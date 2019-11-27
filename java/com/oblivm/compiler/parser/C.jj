@@ -144,8 +144,6 @@ TOKEN : {
 	<PUBLIC: "public"> |
 	<STRUCT: "struct"> |
 	<NATIVE: "native"> |
-	<DUMMY: "dummy"> |
-	<PHANTOM: "phantom"> |
 	<TYPEDEF: "typedef"> |
 	<FOR: "for"> |
 	<BFOR: "bfor"> |
@@ -770,7 +768,7 @@ void FunctionDefinition() :
 	ASTVariableType at;
 }
 {
-	(<PHANTOM> { isDummy = true; })?
+
 	
 	( <VOID> { retType = ASTVoidType.get(); }
 	 | retType = Type(ASTLabel.Secure)

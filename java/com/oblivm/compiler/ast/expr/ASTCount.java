@@ -3,6 +3,8 @@
  */
 package com.oblivm.compiler.ast.expr;
 
+import com.oblivm.compiler.type.manage.Count;
+
 public class ASTCount {
 	public static final ASTCount Zero = new ASTCount("zero", 0);
 	public static final ASTCount One = new ASTCount("one", 1);
@@ -48,27 +50,28 @@ public class ASTCount {
 	 */
 	public ASTCount join(ASTCount cnt) {
 		if(this == ASTCount.Zero && cnt==ASTCount.Zero)
-			return cnt;
+			return ASTCount.Zero;
 		if(cnt == ASTCount.One && this == ASTCount.Zero)
-			return cnt;
+			return ASTCount.One;
 		if(cnt==ASTCount.Zero && this == ASTCount.One)
-			return this;
+			return ASTCount.One;
 		if(cnt == ASTCount.One && this == ASTCount.One)
 			return ASTCount.Two;
 		if(cnt==ASTCount.Two && this == ASTCount.Zero)
-			return cnt;
+			return ASTCount.Two;
 		if(cnt == ASTCount.Zero && this == ASTCount.Two)
-			return this;
+			return ASTCount.Two;
 		if(cnt==ASTCount.One && this == ASTCount.Two)
 			return ASTCount.Three;
 		if(cnt == ASTCount.Two && this == ASTCount.One)
 			return ASTCount.Three;
 		if(cnt==ASTCount.Three && this == ASTCount.Zero)
-			return cnt;
+			return ASTCount.Three;
 		if(cnt == ASTCount.Zero && this == ASTCount.Three)
-			return this;
-		return null;
+			return ASTCount.Three;
+	return cnt;
 	}
+	
 
 	/***
 	 * this cap cnt

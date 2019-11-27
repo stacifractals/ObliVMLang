@@ -481,19 +481,22 @@ public class TypeEmittable extends Emittable {
 			out.print(codeGen.dataType+" __isPhantom");
 		}
 		out.println(") throws Exception {");
+		
 		if(method.isPhantom) {
-			// Phantomize the input
+			/*// Phantomize the input
 			for(Pair<Type, String> ent : method.parameters) {
 				Type type = ent.left;
 				if(type.getLabel() == Label.Pub)
 					continue;
 				if(type instanceof RndType) {
 					out.println("\t\t"+ent.right+" = intLib.mux("
-							+ ent.right+", intLib.randBools("+ent.right+".length), __isPhantom);");
+						+ ent.right+", intLib.randBools("+ent.right+".length), __isPhantom);");
+					//out.print(codeGen.dataType+" __isPhantom");
 				} else if(type instanceof RecordType || type instanceof VariableType) {
-					out.println("\t\t"+ent.right+" = "+ent.right+".muxFake(__isPhantom);");
+					//out.print(codeGen.dataType+" __isPhantom");
+				out.println("\t\t"+ent.right+" = "+ent.right+".muxFake(__isPhantom);");
 				}
-			}
+			}*/
 		}
 
 		for(Pair<Type, String> ent : method.localVariables) {

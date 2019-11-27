@@ -3,8 +3,8 @@
  */
 package com.oblivm.compiler.ir;
 
+import com.oblivm.compiler.type.manage.Count;
 import com.oblivm.compiler.type.manage.Label;
-import com.oblivm.compiler.statement.manage.Count;
 public class Assign extends IRCode {
 
 	public Label lab;

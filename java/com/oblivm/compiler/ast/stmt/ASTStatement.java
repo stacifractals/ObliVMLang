@@ -5,6 +5,7 @@ package com.oblivm.compiler.ast.stmt;
 
 import com.oblivm.compiler.ast.AST;
 import com.oblivm.compiler.ast.expr.ASTCount;
+import com.oblivm.compiler.type.manage.Count;
 
 /**
  * Top level class for statements.  

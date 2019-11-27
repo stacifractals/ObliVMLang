@@ -66,8 +66,8 @@ public class NoClass<t__T> implements IWritable<NoClass<t__T>, t__T>, ISecureRun
 	}
 
 	public t__T[] main(int n, int m, t__T[] x, t__T[] y) throws Exception {
-		SecureArray<t__T> alc = new SecureArray<t__T>(env, (n)/(32), 32);
-		for(int _j_2 = 0; _j_2 < (n)/(32); ++_j_2) {
+		SecureArray<t__T> alc = new SecureArray<t__T>(env, 32, 32);
+		for(int _j_2 = 0; _j_2 < 32; ++_j_2) {
 			alc.write(intLib.toSignals(_j_2), env.inputOfAlice(Utils.fromInt(0, 32)));
 		}
 		int N = 0;
@@ -85,23 +85,16 @@ public class NoClass<t__T> implements IWritable<NoClass<t__T>, t__T>, ISecureRun
 		boolean f_tmp_4 = N > __tmp3;
 		boolean __tmp4 = f_tmp_4;
 		if(__tmp4) {
-			int __tmp5 = ((n & ((1<<(((32)*((N)-(1)))+(32))) - 1))>>((32)*((N)-(1))));
-			int __tmp6 = __tmp5;
-			int __tmp7 = 0;
-			t__T[] f_tmp_6 = env.inputOfAlice(Utils.fromInt(__tmp7, 32));
-			t__T[] f_tmp_7 = env.inputOfAlice(Utils.fromInt(__tmp6, 32));
+			int __tmp5 = 5;
+			t__T[] f_tmp_6 = env.inputOfAlice(Utils.fromInt(n, 32));
+			t__T[] f_tmp_7 = env.inputOfAlice(Utils.fromInt(__tmp5, 32));
 			alc.write(f_tmp_6,f_tmp_7);
-			int __tmp8 = 0;
-			int __tmp9 = 0;
-			t__T[] f_tmp_10 = env.inputOfAlice(Utils.fromInt(__tmp9, 32));
-			t__T[] f_tmp_11 = env.inputOfAlice(Utils.fromInt(__tmp8, 32));
-			alc.write(f_tmp_10,f_tmp_11);
 		} else {
-			int __tmp10 = 0;
-			int __tmp11 = 0;
-			t__T[] f_tmp_14 = env.inputOfAlice(Utils.fromInt(__tmp11, 32));
-			t__T[] f_tmp_15 = env.inputOfAlice(Utils.fromInt(__tmp10, 32));
-			alc.write(f_tmp_14,f_tmp_15);
+			int __tmp6 = 0;
+			int __tmp7 = 0;
+			t__T[] f_tmp_10 = env.inputOfAlice(Utils.fromInt(__tmp7, 32));
+			t__T[] f_tmp_11 = env.inputOfAlice(Utils.fromInt(__tmp6, 32));
+			alc.write(f_tmp_10,f_tmp_11);
 		}
 		return flt;
 
