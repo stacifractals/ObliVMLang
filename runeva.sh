@@ -1,1 +1,1 @@
-java -cp to-run/:lib/* com.oblivm.backend.lang.inter.Cmd -t eva -i $1 -c com.oblivm.backend.generated.euclidean.NoClass
+java -cp to-run/:lib/* com.oblivm.backend.lang.inter.Cmd -t eva -i $1 -c com.oblivm.backend.generated.test.NoClass

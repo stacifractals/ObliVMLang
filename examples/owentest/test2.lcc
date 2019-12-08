@@ -1,13 +1,17 @@
 package com.oblivm.backend.generated.test;
 
-int32 main@n@m(int@n x) {
-    secure int32[secure n/32] alc;
+int32 main@n@m(int@n x, int@m y) {
+   	secure int32[secure 32 ] alc;
+	public int N = n / 32;
 	secure int flt = 0;
-if (n > 0) {
-      alc[n]=n;
-      alc[0]=1;
-   } else {
-      alc[0]=3;
+  if (N > 0) {
+     alc[n]=5;
+     alc[n-1]=2
    }
-   return flt;
+   else {
+      alc[0]=0;
+      alc[n]=3;
+  }
+
+  return flt;
 }

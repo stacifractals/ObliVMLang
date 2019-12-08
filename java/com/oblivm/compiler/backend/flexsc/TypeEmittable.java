@@ -475,14 +475,14 @@ public class TypeEmittable extends Emittable {
 			else out.print(", ");
 			out.print(codeGen.visit(ent.left)+" "+ent.right);
 		}
-		if(method.isPhantom) {
-			if(f) f = false;
-			else out.print(", ");
-			out.print(codeGen.dataType+" __isPhantom");
-		}
+		//if(method.isPhantom) {
+			//if(f) f = false;
+			//else out.print(", ");
+			//out.print(codeGen.dataType+" __isPhantom");
+//		}
 		out.println(") throws Exception {");
 		
-		if(method.isPhantom) {
+		//if(method.isPhantom) {
 			/*// Phantomize the input
 			for(Pair<Type, String> ent : method.parameters) {
 				Type type = ent.left;
@@ -497,7 +497,7 @@ public class TypeEmittable extends Emittable {
 				out.println("\t\t"+ent.right+" = "+ent.right+".muxFake(__isPhantom);");
 				}
 			}*/
-		}
+		//}
 
 		for(Pair<Type, String> ent : method.localVariables) {
 			String cons = codeGen.constructor(ent.left);

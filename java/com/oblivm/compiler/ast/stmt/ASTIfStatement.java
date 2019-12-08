@@ -28,9 +28,9 @@ public class ASTIfStatement extends ASTStatement {
 		trueBranch = new ArrayList<ASTStatement>();
 		falseBranch = new ArrayList<ASTStatement>();
 	
-		for(int i=0; i<trueBranch.size(); ++i) {
+/*		for(int i=0; i<trueBranch.size(); ++i) {
 			tcnt.join(trueBranch.get(i).getCount());
-			System.out.println("If Statement True Count is" + tcnt );
+		//	System.out.println("If Statement True Count is" + tcnt );
 		}
 		if(falseBranch.size() == 0) {
 			fcnt=ASTCount.Zero;
@@ -39,7 +39,7 @@ public class ASTIfStatement extends ASTStatement {
 				fcnt.join(falseBranch.get(i).getCount());
 			System.out.println("If False Statement Count is" + fcnt);
 	}
-		}
+		}*/
 	}
 	
 	public String toString(int indent) {

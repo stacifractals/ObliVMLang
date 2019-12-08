@@ -4,13 +4,61 @@ int32 main@n@m(int@n x, int@m y) {
    	secure int32[secure 32 ] alc;
 	public int N = n / 32;
 	secure int flt = 0;
-  if (N > 0) {
-     alc[n]=5;
+  if (N >= 0) {
+
+  alc[n]=5;
+if(N>1){
+
+alc[0]=5;
+if(N>2){
+
+alc[0]=5;
+}
+else{
+alc[1]=7;
+}
+}
+else{
+alc[1]=7;
+if(N==0){
+
+alc[0]=5;
+}
+else{
+alc[1]=7;
+}
+}
+
    }
+
+
    else {
       alc[0]=0;
+if(N<1){
+if(N<2){
+alc[0]=5;
+}
 
-  }
+else{
+alc[1]=7;
+}
+alc[0]=5;
+}
+
+
+else{
+alc[n]=7;
+if(N>1){
+
+alc[0]=5;
+}
+else{
+alc[1]=7;
+}
+}
+
+
+}
 
   return flt;
 }
